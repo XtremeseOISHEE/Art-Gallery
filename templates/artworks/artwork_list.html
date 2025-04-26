@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block title %}Artworks{% endblock %}
+
+{% block content %}
+    <h2>Available Artworks</h2>
+
+    <!-- Search form -->
+    <form method="get" action="{% url 'artwork_list' %}">
+        <input type="text" name="q" placeholder="Search artworks" value="{{ request.GET.q }}">
+
+        <!-- Category filter -->
+        <select name="category">
+            <option value="">Select Category</option>
+            {% for choice in category_choices %}
+                <option value="{{ choice.0 }}" {% if choice.0 == category %}selected{% endif %}>{{ choice.1 }}</option>
+            {% endfor %}
+        </select>
+
+        <!-- Art Type filter -->
+        <select name="art_type">
+            <option value="">Select Art Type</option>
+            {% for choice in art_type_choices %}
+                <option value="{{ choice.0 }}" {% if choice.0 == art_type %}selected{% endif %}>{{ choice.1 }}</option>
+            {% endfor %}
+        </select>
+
+        <button type="submit">Search</button>
+
+        {% if request.GET.q or category or art_type %}
+            <a href="{% url 'artwork_list' %}">Clear</a>  <!-- Link to clear search and filters -->
+        {% endif %}
+    </form>
+
+    {% if artworks %}
+        <div>
+            {% for artwork in artworks %}
+                <div>
+                    <h3><a href="{% url 'artwork_detail' artwork.pk %}">{{ artwork.title }}</a></h3>
+                    <p>Price: ${{ artwork.price }}</p>
+                    <img src="{{ artwork.image.url }}" alt="{{ artwork.title }}" width="200px">
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination">
+            {% if artworks.has_previous %}
+                <a href="?q={{ request.GET.q }}&category={{ category }}&art_type={{ art_type }}&page=1">&laquo; First</a>
+                <a href="?q={{ request.GET.q }}&category={{ category }}&art_type={{ art_type }}&page={{ artworks.previous_page_number }}">Previous</a>
+            {% endif %}
+            <span>Page {{ artworks.number }} of {{ artworks.paginator.num_pages }}</span>
+            {% if artworks.has_next %}
+                <a href="?q={{ request.GET.q }}&category={{ category }}&art_type={{ art_type }}&page={{ artworks.next_page_number }}">Next</a>
+                <a href="?q={{ request.GET.q }}&category={{ category }}&art_type={{ art_type }}&page={{ artworks.paginator.num_pages }}">Last &raquo;</a>
+            {% endif %}
+        </div>
+
+    {% else %}
+        <p>No artworks found.</p>
+    {% endif %}
+{% endblock %}

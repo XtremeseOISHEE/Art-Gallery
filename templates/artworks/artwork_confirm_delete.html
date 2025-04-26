@@ -1,0 +1,13 @@
+<!-- templates/artworks/artwork_confirm_delete.html -->
+{% extends 'base.html' %}
+
+{% block title %}Confirm Delete{% endblock %}
+
+{% block content %}
+    <h2>Are you sure you want to delete "{{ artwork.title }}"?</h2>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit">Yes, Delete</button>
+        <a href="{% url 'artwork_detail' artwork.pk %}">Cancel</a>
+    </form>
+{% endblock %}
