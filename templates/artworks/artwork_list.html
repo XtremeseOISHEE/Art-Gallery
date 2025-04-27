@@ -39,6 +39,20 @@
                     <h3><a href="{% url 'artwork_detail' artwork.pk %}">{{ artwork.title }}</a></h3>
                     <p>Price: ${{ artwork.price }}</p>
                     <img src="{{ artwork.image.url }}" alt="{{ artwork.title }}" width="200px">
+
+                    <!-- Add the Order Now button ONLY for buyer or seller -->
+                    {% if user.is_authenticated %}
+                    {% if user.role == 'buyer' %}
+                      <a href="{% url 'create_order' artwork.id %}">
+                        <button>Order Now</button>
+                      </a>
+                    {% elif user.role == 'seller' and artwork.artist != user %}
+                      <a href="{% url 'create_order' artwork.id %}">
+                        <button>Order Now</button>
+                     </a>
+                    {% endif %}
+                    {% endif %}
+
                 </div>
             {% endfor %}
         </div>

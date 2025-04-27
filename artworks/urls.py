@@ -10,5 +10,5 @@ urlpatterns = [
     path('<int:pk>/delete/', views.artwork_delete, name='artwork_delete'),
     path('<int:pk>/approve/', views.artwork_approve, name='artwork_approve'),
     path('artworks/search/', views.artwork_search, name='artwork_search'),
-
+    path('my-arts/', views.my_artworks, name='my_artworks'),
 ]
