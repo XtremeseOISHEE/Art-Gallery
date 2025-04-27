@@ -31,3 +31,12 @@ def login_view(request):
     else:
         form = LoginForm()
     return render(request, 'users/login.html', {'form': form})
+
+from django.contrib.auth import logout
+from django.shortcuts import redirect
+
+# Logout View
+def logout_view(request):
+    logout(request)  # Logs out the user
+    return redirect('home')  # Redirect to the homepage or any other page
+

@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block content %}
+  <h1>My Artworks</h1>
+
+  {% if artworks_with_orders %}
+    {% for item in artworks_with_orders %}
+      <div style="margin-bottom: 30px;">
+        <h2>{{ item.artwork.title }}</h2>
+        <p>Orders: {{ item.orders.count }}</p>
+
+        {% if item.orders %}
+          <ul>
+            {% for order in item.orders %}
+              <li>Ordered by: {{ order.user.username }}</li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p>No orders yet.</p>
+        {% endif %}
+      </div>
+    {% endfor %}
+  {% else %}
+    <p>You have not uploaded any artwork yet.</p>
+  {% endif %}
+
+{% endblock %}

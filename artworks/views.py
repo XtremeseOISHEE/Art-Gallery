@@ -101,9 +101,31 @@ def artwork_list(request):
 
 
 # Artwork Details
+# def artwork_detail(request, pk):
+#     artwork = Artwork.objects.filter(pk=pk).first()
+    
+#     if artwork is None:
+#         return render(request, '404.html', status=404)  # Custom 404 if artwork not found
+
+#     if not artwork.is_approved:
+#         messages.info(request, "Your artwork is pending approval. We will notify you once it's approved.")
+#         return redirect('artwork_list')  # Redirect to artwork browsing page
+
+#     # Approved artwork: increase view count
+#     artwork.views += 1
+#     artwork.save()
+
+#     return render(request, 'artworks/artwork_detail.html', {'artwork': artwork})
+
+from django.contrib.auth.decorators import login_required
+from django.db.models import Count
+from django.contrib import messages
+from django.shortcuts import render, redirect, get_object_or_404
+
+@login_required
 def artwork_detail(request, pk):
     artwork = Artwork.objects.filter(pk=pk).first()
-    
+
     if artwork is None:
         return render(request, '404.html', status=404)  # Custom 404 if artwork not found
 
@@ -115,7 +137,26 @@ def artwork_detail(request, pk):
     artwork.views += 1
     artwork.save()
 
-    return render(request, 'artworks/artwork_detail.html', {'artwork': artwork})
+    # 🔥 New part starts here
+    show_order_button = request.user.role in ['buyer', 'seller']
+
+    order_count = None
+    all_orders_count = None
+
+    if request.user.role == 'seller' and artwork.artist == request.user:
+        order_count = artwork.order_set.count()
+
+    if request.user.role == 'staff':
+        all_orders_count = Artwork.objects.annotate(order_count=Count('order')).values('title', 'order_count')
+    # 🔥 New part ends here
+
+    return render(request, 'artworks/artwork_detail.html', {
+        'artwork': artwork,
+        'show_order_button': show_order_button,
+        'order_count': order_count,
+        'all_orders_count': all_orders_count,
+    })
+
 
 # Approve Artwork (staff only)
 
@@ -168,4 +209,25 @@ def artwork_search(request):
         'art_type': art_type,
         'category_choices': category_choices,
         'art_type_choices': art_type_choices
+    })
+# artworks/views.py
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render
+from .models import Artwork
+from orders.models import Order
+
+@login_required
+def my_artworks(request):
+    artworks = Artwork.objects.filter(artist=request.user)
+    artworks_with_orders = []
+
+    for artwork in artworks:
+        orders = Order.objects.filter(artwork=artwork)
+        artworks_with_orders.append({
+            'artwork': artwork,
+            'orders': orders
+        })
+
+    return render(request, 'artworks/my_artworks.html', {
+        'artworks_with_orders': artworks_with_orders
     })

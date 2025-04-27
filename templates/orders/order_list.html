@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block title %}My Orders{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1>My Orders</h1>
+
+    {% if orders %}
+        <div class="row">
+            {% for order in orders %}
+                <div class="col-md-4 mb-4">
+                    <div class="card">
+                        <img src="{{ order.artwork.image.url }}" class="card-img-top" alt="{{ order.artwork.title }}">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ order.artwork.title }}</h5>
+                            <p class="card-text">Quantity: {{ order.quantity }}</p>
+                            <p class="card-text">Total Price: ${{ order.total_price }}</p>
+                            <p class="card-text">Status: <strong>{{ order.status|capfirst }}</strong></p>
+
+                            {% if order.status == 'pending' %}
+                                <form method="POST" action="{% url 'cancel_order' order.id %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-danger btn-sm mt-2">Cancel Order</button>
+                                </form>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>You have no orders yet.</p>
+    {% endif %}
+</div>
+{% endblock %}
