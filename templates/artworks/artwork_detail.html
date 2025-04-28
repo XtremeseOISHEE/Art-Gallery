@@ -4,7 +4,7 @@
 
 {% block content %}
     <h2>{{ artwork.title }}</h2>
-    <img src="{{ artwork.image.url }}" alt="{{ artwork.title }}" width="400px">
+    <img src="{{ artwork.image.url }}" alt="{{ artwork.title }}" width="400px" height="600px">
     <p>{{ artwork.description }}</p>
     <p>Price: ${{ artwork.price }}</p>
     <p>Category: {{ artwork.category }}</p>
@@ -15,7 +15,6 @@
         <a href="{% url 'artwork_delete' artwork.pk %}">Delete</a>
     {% endif %}
 
-    <!-- Show the approve button only if the user is staff and the artwork is not approved yet -->
     {% if user.is_staff and not artwork.is_approved %}
         <form method="post" action="{% url 'artwork_approve' artwork.pk %}">
             {% csrf_token %}
@@ -23,22 +22,59 @@
         </form>
     {% endif %}
 
-    <!-- Add the Order Now button -->
-    <!-- Add the Order Now button -->
     {% if user.is_authenticated %}
-    {% if user.role == 'buyer' %}
-        <form method="post" action="{% url 'create_order' artwork.pk %}">
-            {% csrf_token %}
-            <button type="submit">Order Now</button>
-        </form>
-    {% elif user.role == 'seller' and artwork.artist != user %}
-        <form method="post" action="{% url 'create_order' artwork.pk %}">
-            {% csrf_token %}
-            <button type="submit">Order Now</button>
-        </form>
-    {% endif %}
+        {% if user.role == 'buyer' %}
+            <form method="post" action="{% url 'create_order' artwork.pk %}">
+                {% csrf_token %}
+                <button type="submit">Order Now</button>
+            </form>
+        {% elif user.role == 'seller' and artwork.artist != user %}
+            <form method="post" action="{% url 'create_order' artwork.pk %}">
+                {% csrf_token %}
+                <button type="submit">Order Now</button>
+            </form>
+        {% endif %}
     {% endif %}
 
-  
+    <hr>
+
+    <!-- Reviews and Ratings Section -->
+    <p>Average Rating: {{ artwork.average_rating }}⭐</p>
+    <p>Total Reviews: {{ artwork.reviews.count }} Reviews</p>
+
+    <h3>Reviews:</h3>
+    {% for review in artwork.reviews.all %}
+        <p>{{ review.user.username }}: {{ review.rating }}⭐ - {{ review.comment }}</p>
+        {% if review.is_verified_purchase %}
+            <span>✅ Verified Purchase</span>
+        {% endif %}
+        {% if user.is_staff %}
+            <form method="post" action="{% url 'delete_review' review.id %}">
+            {% csrf_token %}
+            <button type="submit">Delete Review</button>
+        </form>
+    {% endif %}
+
+        <p>
+            <a href="{% url 'like_review' review.id %}">Like</a> |
+            <a href="{% url 'add_comment' review.id %}">Comment</a>
+        </p>
+        {% for comment in review.comments.all %}
+            <p>-- {{ comment.user.username }}: {{ comment.comment }}</p>
+        {% endfor %}
+    {% empty %}
+        <p>No reviews yet.</p>
+    {% endfor %}
+
+    {% if user.is_authenticated %}
+        <h3>Leave a Review:</h3>
+        <form method="post" action="{% url 'create_review' artwork.id %}">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Submit Review</button>
+        </form>
+    {% else %}
+        <p><a href="{% url 'login' %}">Login</a> to post a review.</p>
+    {% endif %}
 
 {% endblock %}

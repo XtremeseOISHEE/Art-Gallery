@@ -45,3 +45,11 @@ class Artwork(models.Model):
 
     def __str__(self):
         return self.title
+
+
+@property
+def average_rating(self):
+    reviews = self.reviews.all()
+    if reviews:
+        return round(sum([review.rating for review in reviews]) / reviews.count(), 2)
+    return 0
