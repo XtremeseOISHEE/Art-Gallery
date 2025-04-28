@@ -11,4 +11,6 @@ urlpatterns = [
     path('<int:pk>/approve/', views.artwork_approve, name='artwork_approve'),
     path('artworks/search/', views.artwork_search, name='artwork_search'),
     path('my-arts/', views.my_artworks, name='my_artworks'),
+    path('admin/pending-artworks/', views.pending_artworks, name='pending_artworks'),
+    path('admin/approve-artwork/<int:pk>/', views.artwork_approve, name='artwork_approve'),
 ]

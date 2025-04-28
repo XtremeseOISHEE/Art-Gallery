@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}Pending Artworks{% endblock %}
+
+{% block content %}
+    <h2>Pending Artworks</h2>
+    {% if pending_arts %}
+        <ul class="list-group">
+            {% for artwork in pending_arts %}
+                <li class="list-group-item">
+                    <h3>{{ artwork.title }}</h3>
+                    <p>{{ artwork.description }}</p>
+                    <img src="{{ artwork.image.url }}" alt="{{ artwork.title }}" style="width: 100px; height: auto;">
+                    <p><strong>Price:</strong> {{ artwork.price }}</p>
+                    <form action="{% url 'artwork_approve' pk=artwork.pk %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-success">Approve</button>
+                    </form>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No pending artworks at the moment.</p>
+    {% endif %}
+{% endblock %}

@@ -160,19 +160,7 @@ def artwork_detail(request, pk):
 
 # Approve Artwork (staff only)
 
-@user_passes_test(is_staff)
-def artwork_approve(request, pk):
-    artwork = get_object_or_404(Artwork, pk=pk)
-    
-    # Check if artwork is already approved
-    if artwork.is_approved:
-        return redirect('artwork_detail', pk=artwork.pk)  # Redirect if already approved
-    
-    # Approve the artwork
-    artwork.is_approved = True
-    artwork.save()
-    
-    return redirect('artwork_detail', pk=artwork.pk)
+
 # Search Artworks
 # views.py
 
@@ -231,3 +219,33 @@ def my_artworks(request):
     return render(request, 'artworks/my_artworks.html', {
         'artworks_with_orders': artworks_with_orders
     })
+# views.py
+from django.shortcuts import render, redirect, get_object_or_404
+from .models import Artwork
+from django.contrib.auth.decorators import user_passes_test
+
+# Check if the user is a staff member
+def is_staff(user):
+    return user.is_staff
+
+# View to list all pending artworks
+@user_passes_test(is_staff)
+def pending_artworks(request):
+    pending_arts = Artwork.objects.filter(is_approved=False)
+    return render(request, 'artworks/pending_artworks.html', {'pending_arts': pending_arts})
+
+# View to approve a specific artwork
+@user_passes_test(is_staff)
+def artwork_approve(request, pk):
+    artwork = get_object_or_404(Artwork, pk=pk)
+    
+    # Check if artwork is already approved
+    if artwork.is_approved:
+        return redirect('artwork_detail', pk=artwork.pk)  # Redirect if already approved
+    
+    # Approve the artwork
+    artwork.is_approved = True
+    artwork.save()
+    
+    return redirect('pending_artworks')  # Redirect to the pending artworks page after approving
+

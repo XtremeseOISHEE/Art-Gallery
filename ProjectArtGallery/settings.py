@@ -41,6 +41,8 @@ INSTALLED_APPS = [
     'users',
     'artworks',
     'orders',
+    'admin_dashboard',
+
     'reviews',
 ]
 
@@ -135,3 +137,5 @@ STATICFILES_DIRS = [
 ]
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+LOGIN_URL = '/users/login/'

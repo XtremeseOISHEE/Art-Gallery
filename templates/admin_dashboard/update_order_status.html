@@ -1,0 +1,26 @@
+<!-- templates/admin_dashboard/update_order_status.html -->
+{% extends 'base.html' %}
+
+{% block title %}Update Order Status{% endblock %}
+
+{% block content %}
+    <h2>Update Order Status</h2>
+
+    <form method="post">
+        {% csrf_token %}
+        
+        <div style="margin-bottom: 15px;">
+            <label for="status">Status:</label><br>
+            <select name="status" id="status" style="padding: 8px; margin-top: 5px; width: 100%;">
+                <option value="pending" {% if order.status == 'pending' %}selected{% endif %}>Pending</option>
+                <option value="completed" {% if order.status == 'completed' %}selected{% endif %}>Completed</option>
+                <option value="disputed" {% if order.status == 'disputed' %}selected{% endif %}>Disputed</option>
+                <option value="canceled" {% if order.status == 'canceled' %}selected{% endif %}>Canceled</option>
+            </select>
+        </div>
+
+        <button type="submit" style="padding: 10px 20px; background-color: #007bff; border: none; border-radius: 5px; color: white; font-weight: bold; cursor: pointer;">
+            Update Status
+        </button>
+    </form>
+{% endblock %}

@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ profile.user.username }}'s Profile{% endblock %}
+
+{% block content %}
+    <div style="max-width: 600px; margin: 0 auto; background-color: #23272a; padding: 30px; border-radius: 10px; text-align: center;">
+        {% if profile.profile_picture %}
+            <img src="{{ profile.profile_picture.url }}" alt="Profile Picture" width="150" height="150" style="border-radius: 50%; object-fit: cover;">
+        {% else %}
+            <img src="https://via.placeholder.com/150" alt="Default Picture" style="border-radius: 50%; object-fit: cover;">
+        {% endif %}
+        <h2 style="margin-top: 20px;">{{ profile.user.username }}</h2>
+        <p><strong>Role:</strong> {{ profile.user.role|title }}</p>
+        <p><strong>Bio:</strong> {{ profile.bio }}</p>
+        <p><strong>Phone:</strong> {{ profile.phone }}</p>
+        <p><strong>Address:</strong> {{ profile.address }}</p>
+    </div>
+{% endblock %}
