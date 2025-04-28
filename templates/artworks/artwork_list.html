@@ -6,10 +6,9 @@
     <h2>Available Artworks</h2>
 
     <!-- Search form -->
-    <form method="get" action="{% url 'artwork_list' %}">
+    <form method="get" action="{% url 'artwork_list' %}" class="search-form">
         <input type="text" name="q" placeholder="Search artworks" value="{{ request.GET.q }}">
-
-        <!-- Category filter -->
+        
         <select name="category">
             <option value="">Select Category</option>
             {% for choice in category_choices %}
@@ -17,7 +16,6 @@
             {% endfor %}
         </select>
 
-        <!-- Art Type filter -->
         <select name="art_type">
             <option value="">Select Art Type</option>
             {% for choice in art_type_choices %}
@@ -28,31 +26,30 @@
         <button type="submit">Search</button>
 
         {% if request.GET.q or category or art_type %}
-            <a href="{% url 'artwork_list' %}">Clear</a>  <!-- Link to clear search and filters -->
+            <a href="{% url 'artwork_list' %}">Clear</a>
         {% endif %}
     </form>
 
     {% if artworks %}
-        <div>
+        <div class="artwork-grid">
             {% for artwork in artworks %}
-                <div>
-                    <h3><a href="{% url 'artwork_detail' artwork.pk %}">{{ artwork.title }}</a></h3>
-                    <p>Price: ${{ artwork.price }}</p>
+                <div class="artwork-card">
                     <img src="{{ artwork.image.url }}" alt="{{ artwork.title }}" width="200px">
+                    <h3><a href="{% url 'artwork_detail' artwork.pk %}">{{ artwork.title }}</a></h3>
+                    <p><strong>Price:</strong> ${{ artwork.price }}</p>
 
-                    <!-- Add the Order Now button ONLY for buyer or seller -->
+                    <!-- Add the Order Now button for buyers or other sellers -->
                     {% if user.is_authenticated %}
-                    {% if user.role == 'buyer' %}
-                      <a href="{% url 'create_order' artwork.id %}">
-                        <button>Order Now</button>
-                      </a>
-                    {% elif user.role == 'seller' and artwork.artist != user %}
-                      <a href="{% url 'create_order' artwork.id %}">
-                        <button>Order Now</button>
-                     </a>
+                        {% if user.role == 'buyer' %}
+                            <a href="{% url 'create_order' artwork.id %}">
+                                <button>Order Now</button>
+                            </a>
+                        {% elif user.role == 'seller' and artwork.artist != user %}
+                            <a href="{% url 'create_order' artwork.id %}">
+                                <button>Order Now</button>
+                            </a>
+                        {% endif %}
                     {% endif %}
-                    {% endif %}
-
                 </div>
             {% endfor %}
         </div>
