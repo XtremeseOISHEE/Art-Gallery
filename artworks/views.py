@@ -117,52 +117,151 @@ def artwork_list(request):
 
 #     return render(request, 'artworks/artwork_detail.html', {'artwork': artwork})
 
-from django.contrib.auth.decorators import login_required
+# from django.contrib.auth.decorators import login_required
+# from django.db.models import Count
+# from django.contrib import messages
+# from django.shortcuts import render, redirect, get_object_or_404
+# from reviews.forms import ReviewForm
+
+# @login_required
+# def artwork_detail(request, pk):
+#     # Retrieve the artwork or return a 404 if not found
+#     artwork = get_object_or_404(Artwork, pk=pk)
+
+#     # Check if the artwork is approved
+#     if not artwork.is_approved:
+#         messages.info(request, "Your artwork is pending approval. We will notify you once it's approved.")
+#         return redirect('artwork_list')
+
+#     # Approved artwork: increase view count
+#     artwork.views += 1
+#     artwork.save()
+
+#     # Determine whether to show the order button based on the user's role
+#     show_order_button = request.user.role in ['buyer', 'seller']
+
+#     order_count = None
+#     all_orders_count = None
+
+#     # Seller order count
+#     if request.user.role == 'seller' and artwork.artist == request.user:
+#         order_count = artwork.order_set.count()
+
+#     # Staff order counts
+#     if request.user.role == 'staff':
+#         all_orders_count = Artwork.objects.annotate(order_count=Count('order')).values('title', 'order_count')
+
+#     # Prepare likes for reviews
+#     user_likes = {}
+#     if request.user.is_authenticated:
+#         for review in artwork.reviews.all():
+#             like = review.likes.filter(user=request.user).first()
+#             if like:
+#                 user_likes[review.id] = like.is_like
+
+#     # Render page
+#     return render(request, 'artworks/artwork_detail.html', {
+#         'artwork': artwork,
+#         'show_order_button': show_order_button,
+#         'order_count': order_count,
+#         'all_orders_count': all_orders_count,
+#         'form': ReviewForm(),  # Assuming you have a form
+#         'user_likes': user_likes,
+#     })
+# # Approve Artwork (staff only)
+
+# @user_passes_test(is_staff)
+# def artwork_approve(request, pk):
+#     artwork = get_object_or_404(Artwork, pk=pk)
+    
+#     # Check if artwork is already approved
+#     if artwork.is_approved:
+#         return redirect('artwork_detail', pk=artwork.pk)  # Redirect if already approved
+    
+#     # Approve the artwork
+#     artwork.is_approved = True
+#     artwork.save()
+    
+#     return redirect('artwork_detail', pk=artwork.pk)
+# # Search Artworks
+# # views.py
+
+
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db.models import Count
 from django.contrib import messages
 from django.shortcuts import render, redirect, get_object_or_404
+from reviews.forms import ReviewForm, ReviewCommentForm  # Add ReviewCommentForm if needed
+from artworks.models import Artwork
+from reviews.models import Review, ReviewLike, ReviewComment
 
 @login_required
 def artwork_detail(request, pk):
-    artwork = Artwork.objects.filter(pk=pk).first()
+    # Retrieve the artwork
+    artwork = get_object_or_404(Artwork, pk=pk)
 
-    if artwork is None:
-        return render(request, '404.html', status=404)  # Custom 404 if artwork not found
-
+    # Check if the artwork is approved
     if not artwork.is_approved:
         messages.info(request, "Your artwork is pending approval. We will notify you once it's approved.")
-        return redirect('artwork_list')  # Redirect to artwork browsing page
+        return redirect('artwork_list')
 
     # Approved artwork: increase view count
     artwork.views += 1
     artwork.save()
 
-    # 🔥 New part starts here
+    # Determine whether to show the order button
     show_order_button = request.user.role in ['buyer', 'seller']
 
     order_count = None
     all_orders_count = None
 
+    # Seller order count
     if request.user.role == 'seller' and artwork.artist == request.user:
         order_count = artwork.order_set.count()
 
+    # Staff order counts
     if request.user.role == 'staff':
         all_orders_count = Artwork.objects.annotate(order_count=Count('order')).values('title', 'order_count')
-    # 🔥 New part ends here
 
-    return render(request, 'artworks/artwork_detail.html', {
+    # Get all reviews for the artwork
+    reviews = artwork.reviews.all()
+
+    # Prepare likes and dislikes counts + user like/dislike status
+    user_likes = {}
+    for review in reviews:
+        review.likes_count = review.likes.filter(is_like=True).count()
+        review.dislikes_count = review.likes.filter(is_like=False).count()
+
+        # Check if the current user has liked or disliked
+        like = review.likes.filter(user=request.user).first()
+        if like:
+            user_likes[review.id] = like.is_like
+
+    # Render the page
+    context = {
         'artwork': artwork,
         'show_order_button': show_order_button,
         'order_count': order_count,
         'all_orders_count': all_orders_count,
-    })
+        'reviews': reviews,  # pass reviews manually
+        'form': ReviewForm(),  # form for adding a review
+        'user_likes': user_likes,
+    }
+
+    return render(request, 'artworks/artwork_detail.html', context)
 
 
-# Approve Artwork (staff only)
+@user_passes_test(lambda u: u.is_staff)
+def artwork_approve(request, pk):
+    artwork = get_object_or_404(Artwork, pk=pk)
 
+    if artwork.is_approved:
+        return redirect('artwork_detail', pk=artwork.pk)
 
-# Search Artworks
-# views.py
+    artwork.is_approved = True
+    artwork.save()
+
+    return redirect('artwork_detail', pk=artwork.pk)
 
 def artwork_search(request):
     query = request.GET.get('q')
@@ -219,12 +318,15 @@ def my_artworks(request):
     return render(request, 'artworks/my_artworks.html', {
         'artworks_with_orders': artworks_with_orders
     })
-# views.py
-from django.shortcuts import render, redirect, get_object_or_404
-from .models import Artwork
-from django.contrib.auth.decorators import user_passes_test
 
-# Check if the user is a staff member
+
+from django.shortcuts import render
+
+def homepage(request):
+    return render(request, 'artworks/home.html')
+
+
+
 def is_staff(user):
     return user.is_staff
 
@@ -235,17 +337,16 @@ def pending_artworks(request):
     return render(request, 'artworks/pending_artworks.html', {'pending_arts': pending_arts})
 
 # View to approve a specific artwork
-@user_passes_test(is_staff)
-def artwork_approve(request, pk):
-    artwork = get_object_or_404(Artwork, pk=pk)
+# @user_passes_test(is_staff)
+# def artwork_approve(request, pk):
+#     artwork = get_object_or_404(Artwork, pk=pk)
     
-    # Check if artwork is already approved
-    if artwork.is_approved:
-        return redirect('artwork_detail', pk=artwork.pk)  # Redirect if already approved
+#     # Check if artwork is already approved
+#     if artwork.is_approved:
+#         return redirect('artwork_detail', pk=artwork.pk)  # Redirect if already approved
     
-    # Approve the artwork
-    artwork.is_approved = True
-    artwork.save()
+#     # Approve the artwork
+#     artwork.is_approved = True
+#     artwork.save()
     
-    return redirect('pending_artworks')  # Redirect to the pending artworks page after approving
-
+#     return redirect('pending_artworks')  # Redirect to the pending artworks page after approving
