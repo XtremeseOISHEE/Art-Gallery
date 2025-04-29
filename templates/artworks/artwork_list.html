@@ -34,7 +34,7 @@
         <div class="artwork-grid">
             {% for artwork in artworks %}
                 <div class="artwork-card">
-                    <img src="{{ artwork.image.url }}" alt="{{ artwork.title }}" width="200px">
+                    <a href="{% url 'artwork_detail' artwork.pk %}"><img src="{{ artwork.image.url }}" alt="{{ artwork.title }}" width="200px"></a>
                     <h3><a href="{% url 'artwork_detail' artwork.pk %}">{{ artwork.title }}</a></h3>
                     <p><strong>Price:</strong> ${{ artwork.price }}</p>
 

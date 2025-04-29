@@ -4,97 +4,158 @@
 {% block title %}{{ artwork.title }}{% endblock %}
 
 {% block content %}
-<h2>{{ artwork.title }}</h2>
+<div style="max-width: 800px; margin: auto; padding: 20px; font-family: Arial, sans-serif;">
+  <h2 style="text-align: center; margin-bottom: 20px;">{{ artwork.title }}</h2>
 
-<img src="{{ artwork.image.url }}" alt="{{ artwork.title }}" width="400px" height="600px">
-<p>{{ artwork.description }}</p>
-<p>Price: ${{ artwork.price }}</p>
-<p>Category: {{ artwork.category }}</p>
-<p>Artist: {{ artwork.artist.username }}</p>
+  <div style="text-align: center; margin-bottom: 20px;">
+    <img src="{{ artwork.image.url }}" alt="{{ artwork.title }}"
+         style="max-width: 100%; height: auto; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+  </div>
 
-{% if user == artwork.artist %}
-    <a href="{% url 'artwork_edit' artwork.pk %}">Edit</a> |
-    <a href="{% url 'artwork_delete' artwork.pk %}">Delete</a>
-{% endif %}
+  <p><strong>Description:</strong> {{ artwork.description }}</p>
+  <p><strong>Price:</strong> ${{ artwork.price }}</p>
+  <p><strong>Category:</strong> {{ artwork.category }}</p>
+  <p><strong>Artist:</strong> {{ artwork.artist.username }}</p>
 
-{% if user.is_staff and not artwork.is_approved %}
+  {% if user == artwork.artist %}
+    <p>
+      <a href="{% url 'artwork_edit' artwork.pk %}">Edit</a> |
+      <a href="{% url 'artwork_delete' artwork.pk %}">Delete</a>
+    </p>
+  {% endif %}
+
+  {% if user.is_staff and not artwork.is_approved %}
     <form method="post" action="{% url 'artwork_approve' artwork.pk %}">
-        {% csrf_token %}
-        <button type="submit">Approve Artwork</button>
+      {% csrf_token %}
+      <button type="submit" style="background-color: #4CAF50; color: white; padding: 10px 15px; border: none; border-radius: 5px;">Approve Artwork</button>
     </form>
-{% endif %}
+  {% endif %}
 
-{% if show_order_button %}
-    <form method="post" action="{% url 'create_order' artwork.pk %}">
-        {% csrf_token %}
-        <button type="submit">Order Now</button>
+  {% if show_order_button %}
+    <form method="post" action="{% url 'create_order' artwork.pk %}" style="margin-top: 15px;">
+      {% csrf_token %}
+      <button type="submit" style="background-color: #007BFF; color: white; padding: 10px 15px; border: none; border-radius: 5px;">Order Now</button>
     </form>
-{% endif %}
+  {% endif %}
 
-<hr>
+  <hr style="margin: 30px 0;">
 
-<h3>Average Rating: {{ artwork.average_rating|default:"No ratings yet" }}⭐</h3>
-<p>Total Reviews: {{ reviews|length }} reviews</p>
+  <h3>⭐ Average Rating: {{ artwork.average_rating|default:"No ratings yet" }}</h3>
+  <p>Total Reviews: {{ reviews|length }}</p>
 
-<h3>Reviews:</h3>
+  <h3>Reviews:</h3>
 
-{% for review in reviews %}
-    <div class="review">
-        <p><strong>{{ review.user.username }}</strong>: {{ review.rating }}⭐ - {{ review.comment }}</p>
+  {% for review in reviews %}
+    <div style="border: 1px solid #ccc; padding: 10px 15px; margin-bottom: 20px; border-radius: 8px;">
+      <p><strong>{{ review.user.username }}</strong>: {{ review.rating }}⭐</p>
+      <p><strong> ➡️ {{ review.comment }}</strong>
+      {% if review.is_verified_purchase %}
+        <span style="color: green;">✅ Verified Purchase</span>
+      {% endif %}
 
-        {% if review.is_verified_purchase %}
-            <span>✅ Verified Purchase</span>
-        {% endif %}
+      {% if user == review.user or user.is_staff %}
+        <form method="post" action="{% url 'delete_review' review.id %}" style="display:inline;">
+          {% csrf_token %}
+          <button type="submit" style="background: none; border: none; color: red; cursor: pointer;">Delete</button>
+        </form> |
+        <a href="{% url 'edit_review' review.id %}">Edit</a>
+      {% endif %}
 
-        {% if user == review.user or user.is_staff %}
-            <form method="post" action="{% url 'delete_review' review.id %}" style="display:inline;">
-                {% csrf_token %}
-                <button type="submit">Delete Review</button>
-            </form> |
-            <a href="{% url 'edit_review' review.id %}">Edit</a>
-        {% endif %}
+      <p>👍 {{ review.likes_count }} | 👎 {{ review.dislikes_count }}</p>
 
-        <p>👍 {{ review.likes_count }} | 👎 {{ review.dislikes_count }}</p>
-
-        <!-- Like/Dislike Buttons -->
+      <p>
         <a href="{% url 'like_review' review.id %}?like=1">Like</a> |
         <a href="{% url 'like_review' review.id %}?like=0">Dislike</a>
+      </p>
 
-        <!-- Comments -->
-        <h4>Comments:</h4>
-        {% for comment in review.comments.all %}
-            <div class="comment">
-                <p>-- <strong>{{ comment.user.username }}</strong>: {{ comment.comment }}</p>
+      <h4 style="margin-top: 10px;">Comments:</h4>
+      {% for comment in review.comments.all %}
+        <div style="margin-left: 15px; border-left: 2px solid #ccc; padding-left: 10px;">
+          <p>  ➡️ <strong>{{ comment.user.username }}</strong>: {{ comment.comment }}</p>
 
-                {% if comment.user == user or user.is_staff %}
-                    <a href="{% url 'edit_comment' comment.id %}">Edit</a> |
-                    <form method="post" action="{% url 'delete_comment' comment.id %}" style="display:inline;">
-                        {% csrf_token %}
-                        <button type="submit" onclick="return confirm('Delete this comment?');">Delete</button>
-                    </form>
-                {% endif %}
-            </div>
-        {% empty %}
-            <p>No comments yet.</p>
-        {% endfor %}
-
-        <p><a href="{% url 'add_comment' review.id %}">Add Comment</a></p>
+          {% if comment.user == user or user.is_staff %}
+            <a href="{% url 'edit_comment' comment.id %}">Edit</a> |
+            <form method="post" action="{% url 'delete_comment' comment.id %}" style="display:inline;">
+              {% csrf_token %}
+              <button type="submit" onclick="return confirm('Delete this comment?');" style="background: none; border: none; color: red; cursor: pointer;">Delete</button>
+            </form>
+          {% endif %}
+        </div>
+      {% empty %}
+        <p>No comments yet.</p>
+      {% endfor %}
+      <p><a href="{% url 'add_comment' review.id %}">Add Comment</a></p>
     </div>
-{% empty %}
+  {% empty %}
     <p>No reviews yet.</p>
-{% endfor %}
+  {% endfor %}
 
-<hr>
+  <hr style="margin: 30px 0;">
 
-{% if user.is_authenticated %}
-    <h3>Leave a Review:</h3>
-    <form method="post" action="{% url 'create_review' artwork.pk %}">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Submit Review</button>
-    </form>
+  {% if user.is_authenticated %}
+  <h3>Leave a Review:</h3>
+  <form method="post" action="{% url 'create_review' artwork.pk %}" style="margin-top: 15px; max-width: 600px;">
+    {% csrf_token %}
+    <div style="margin-bottom: 10px;">
+      {{ form.as_p }}
+    </div>
+    <div style="text-align: right;">
+      <button type="submit"
+              style="background-color: #28a745;
+                     color: white;
+                     padding: 8px 16px;
+                     border: none;
+                     border-radius: 5px;
+                     font-size: 16px;
+                     cursor: pointer;">
+        Submit Review
+      </button>
+    </div>
+  </form>
 {% else %}
-    <p><a href="{% url 'login' %}">Login</a> to post a review.</p>
+  <p><a href="{% url 'login' %}">Login</a> to post a review.</p>
 {% endif %}
+<style>
+    textarea, input[type="text"], input[type="number"], select {
+      width: 100%;
+      max-width: 100%;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+      display: block;
+      margin-top: 5px;
+    }
+  
+    form p {
+      margin-bottom: 15px;
+    }
+  
+    .review-form {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      height: 280px; /* Adjust height as needed */
+    }
+  
+    .review-form .fields {
+      flex: 1;
+    }
+  
+    .review-form .submit-btn {
+      text-align: right;
+    }
+  
+    .review-form button {
+      background-color: #28a745;
+      color: white;
+      padding: 8px 16px;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+  </style>
+  
 
 {% endblock %}
