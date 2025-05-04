@@ -4,24 +4,36 @@
 
 {% block content %}
 <div class="container mt-5">
-    <h1>My Orders</h1>
+    <h1 class="text-center text-white mb-4">My Orders</h1>
 
     {% if orders %}
         <div class="row">
             {% for order in orders %}
-                <div class="col-md-4 mb-4">
-                    <div class="card">
-                        <img src="{{ order.artwork.image.url }}" class="card-img-top" alt="{{ order.artwork.title }}">
-                        <div class="card-body">
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card bg-dark text-white shadow-sm border-0 h-100">
+                        <div class="px-5 pt-5">
+                            <img src="{{ order.artwork.image.url }}" class="img-fluid rounded" alt="{{ order.artwork.title }}">
+                        </div>
+                        
+                        <div class="card-body d-flex flex-column">
                             <h5 class="card-title">{{ order.artwork.title }}</h5>
-                            <p class="card-text">Quantity: {{ order.quantity }}</p>
-                            <p class="card-text">Total Price: ${{ order.total_price }}</p>
-                            <p class="card-text">Status: <strong>{{ order.status|capfirst }}</strong></p>
+                            <p class="card-text mb-1">Quantity: {{ order.quantity }}</p>
+                            <p class="card-text mb-1">Total Price: ${{ order.total_price }}</p>
+                            <p class="card-text">Status: 
+                                <span class="badge 
+                                    {% if order.status == 'pending' %}bg-warning text-dark
+                                    {% elif order.status == 'shipped' %}bg-info
+                                    {% elif order.status == 'delivered' %}bg-success
+                                    {% else %}bg-secondary
+                                    {% endif %}">
+                                    {{ order.status|capfirst }}
+                                </span>
+                            </p>
 
                             {% if order.status == 'pending' %}
-                                <form method="POST" action="{% url 'cancel_order' order.id %}">
+                                <form method="POST" action="{% url 'cancel_order' order.id %}" class="mt-auto">
                                     {% csrf_token %}
-                                    <button type="submit" class="btn btn-danger btn-sm mt-2">Cancel Order</button>
+                                    <button type="submit" class="btn btn-danger btn-sm w-100">Cancel Order</button>
                                 </form>
                             {% endif %}
                         </div>
@@ -30,7 +42,7 @@
             {% endfor %}
         </div>
     {% else %}
-        <p>You have no orders yet.</p>
+        <div class="alert alert-info text-center">You have no orders yet.</div>
     {% endif %}
 </div>
 {% endblock %}
