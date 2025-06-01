@@ -2,13 +2,16 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate
 from .forms import CustomUserCreationForm, LoginForm
 # users/views.py
-
+from django.shortcuts import render, get_object_or_404
+from .models import User
 from django.contrib.auth.decorators import user_passes_test
 
 def staff_or_admin_required(view_func):
     return user_passes_test(
         lambda u: u.is_authenticated and (u.is_superuser or u.role == 'staff')
     )(view_func)
+from django.shortcuts import render, get_object_or_404
+from .models import User
 
 # Registration View
 def register(request):
@@ -48,3 +51,33 @@ def logout_view(request):
     logout(request)  # Logs out the user
     return redirect('home')  # Redirect to the homepage or any other page
 
+
+
+def view_profile(request, username):
+    user = get_object_or_404(User, username=username)
+    profile = getattr(user, 'userprofile', None)
+    return render(request, 'users/view_profile.html', {'profile': profile, 'user_obj': user})
+
+
+from django.shortcuts import render, redirect
+from .models import UserProfile
+from .forms import UserProfileForm  # niche form example dilam
+from django.contrib.auth.decorators import login_required, user_passes_test
+
+
+@login_required
+def edit_profile(request):
+    if not hasattr(request.user, 'userprofile'):
+        UserProfile.objects.create(user=request.user)
+
+    profile = request.user.userprofile
+
+    if request.method == 'POST':
+        form = UserProfileForm(request.POST, instance=profile)
+        if form.is_valid():
+            form.save()
+            return redirect('user_profile')
+    else:
+        form = UserProfileForm(instance=profile)
+
+    return render(request, 'users/edit_profile.html', {'form': form})

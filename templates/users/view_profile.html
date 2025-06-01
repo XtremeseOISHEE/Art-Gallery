@@ -1,6 +1,10 @@
-<h1>{{ user.username }}'s Profile</h1>
-<img src="{{ profile.profile_picture.url }}" alt="Profile Picture" width="150">
-<p>Bio: {{ profile.bio }}</p>
-<p>Phone: {{ profile.phone }}</p>
-<p>Address: {{ profile.address }}</p>
-<a href="{% url 'edit_profile' %}">Edit Profile</a>
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>{{ user_obj.full_name }}'s Profile</h1>
+<p><strong>Username:</strong> {{ user_obj.username }}</p>
+<p><strong>Email:</strong> {{ user_obj.email }}</p>
+<p><strong>Role:</strong> {{ user_obj.role }}</p>
+<p><strong>Address:</strong> {{ profile.address }}</p>
+<p><strong>Phone:</strong> {{ profile.phone }}</p>
+{% endblock %}

@@ -13,7 +13,7 @@
           {% if item.orders %}
             <ul style="list-style: none; padding-left: 0;">
               {% for order in item.orders %}
-                <li>👤 {{ order.user.username }}</li>
+                 <li>👤 <a href="{% url 'view_profile' order.user.username %}">{{ order.user.username }}</a></li>
               {% endfor %}
             </ul>
           {% else %}
