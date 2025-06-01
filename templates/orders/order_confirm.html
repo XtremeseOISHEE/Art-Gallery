@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2 class="mb-4 text-center">Confirm Your Order</h2>
+
+<div class="mb-3 text-center">
+  <strong>Artwork:</strong> {{ order.artwork.title }}<br>
+  <strong>Quantity:</strong> {{ order.quantity }}<br>
+  <strong>Total Price:</strong> {{ order.total_price }}৳
+</div>
+
+<form method="POST" class="border p-4 rounded shadow-sm bg-dark text-white">
+  {% csrf_token %}
+
+  <div class="mb-3">
+    <label for="name" class="form-label">Full Name:</label>
+    <input type="text" name="name" class="form-control bg-dark text-white" required>
+  </div>
+
+  <div class="mb-3">
+    <label for="phone" class="form-label">Phone Number:</label>
+    <input type="text" name="phone" class="form-control bg-dark text-white" required>
+  </div>
+
+  <div class="mb-3">
+    <label for="address" class="form-label">Delivery Address:</label>
+    <textarea name="address" class="form-control bg-dark text-white" rows="3" required></textarea>
+  </div>
+  
+  <div class="text-center">
+    <button type="submit" class="btn btn-primary px-4">💳 Proceed to Payment</button>
+  </div>
+</form>
+{% endblock %}

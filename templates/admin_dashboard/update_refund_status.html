@@ -1,0 +1,37 @@
+<!-- templates/admin_dashboard/update_order_status.html -->
+{% extends 'base.html' %}
+
+{% block title %}Update Refund Status{% endblock %}
+
+{% block content %}
+    <h2>Update Refund Status</h2>
+
+    <form method="post">
+        {% csrf_token %}
+        
+        <!-- <div style="margin-bottom: 15px;">
+            <label for="status">Status:</label><br>
+            <select name="status" id="status" style="padding: 8px; margin-top: 5px; width: 100%;">
+                <option value="pending" {% if order.status == 'pending' %}selected{% endif %}>Pending</option>
+                <option value="completed" {% if order.status == 'completed' %}selected{% endif %}>Completed</option>
+                <option value="disputed" {% if order.status == 'disputed' %}selected{% endif %}>Disputed</option>
+                <option value="canceled" {% if order.status == 'canceled' %}selected{% endif %}>Canceled</option>
+            </select>
+        </div> -->
+        {% if order.is_refunded %}
+        <div style="margin-bottom: 15px;">
+            <label for="refund_status">Refund Status:</label><br>
+            <select name="refund_status" id="refund_status" style="padding: 8px; margin-top: 5px; width: 100%;">
+                <option value="pending" {% if order.refund_status == 'pending' %}selected{% endif %}>Pending</option>
+                <option value="approved" {% if order.refund_status == 'approved' %}selected{% endif %}>Approved</option>
+                <option value="rejected" {% if order.refund_status == 'rejected' %}selected{% endif %}>Rejected</option>
+            </select>
+        </div>
+        {% else %}
+            <p style="color: gray;">No refund was requested for this order.</p>
+        {% endif %}
+        <button type="submit" style="padding: 10px 20px; background-color: #007bff; border: none; border-radius: 5px; color: white; font-weight: bold; cursor: pointer;">
+            Update Refund Status
+        </button>
+    </form>
+{% endblock %}
