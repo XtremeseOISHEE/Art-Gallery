@@ -1,6 +1,14 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate
 from .forms import CustomUserCreationForm, LoginForm
+# users/views.py
+
+from django.contrib.auth.decorators import user_passes_test
+
+def staff_or_admin_required(view_func):
+    return user_passes_test(
+        lambda u: u.is_authenticated and (u.is_superuser or u.role == 'staff')
+    )(view_func)
 
 # Registration View
 def register(request):

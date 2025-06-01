@@ -42,7 +42,7 @@ INSTALLED_APPS = [
     'artworks',
     'orders',
     'admin_dashboard',
-
+    'payments',
     'reviews',
 ]
 

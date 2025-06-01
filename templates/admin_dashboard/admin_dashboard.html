@@ -32,6 +32,9 @@
                 <th style="border: 1px solid #444; padding: 12px;">Total Price</th>
                 <th style="border: 1px solid #444; padding: 12px;">Status</th>
                 <th style="border: 1px solid #444; padding: 12px;">Actions</th>
+                <th style="border: 1px solid #444; padding: 12px;">Refund Requested</th>
+                <th style="border: 1px solid #444; padding: 12px;">Refund Status</th>
+                <th style="border: 1px solid #444; padding: 12px;">Refund Action</th>
             </tr>
         </thead>
         <tbody>
@@ -48,6 +51,29 @@
                     <a href="{% url 'update_order_status' order.id %}" style="display: inline-block; background-color: #007bff; color: white; padding: 8px 12px; border-radius: 5px; text-decoration: none; font-weight: bold;">
                         Update Status
                     </a>
+                </td>
+                <td style="border: 1px solid #444; padding: 12px;">
+                    {% if order.is_refunded %}
+                        ✅ Requested
+                    {% else %}
+                        ❌ Not Requested
+                    {% endif %}
+                </td>
+                <td style="border: 1px solid #444; padding: 12px;">
+                    {% if order.is_refunded %}
+                        {{ order.refund_status|capfirst }}
+                    {% else %}
+                        N/A
+                    {% endif %}
+                </td>
+                <td style="border: 1px solid #444; padding: 12px;">
+                    {% if order.is_refunded %}
+                        <a href="{% url 'update_refund_status' order.id %}" style="display: inline-block; background-color: #007bff; color: white; padding: 8px 12px; border-radius: 5px; text-decoration: none; font-weight: bold;">
+                        Update Refund Status
+                    </a>
+                    {% else %}
+                        N/A
+                    {% endif %}
                 </td>
             </tr>
             {% endfor %}

@@ -34,3 +34,30 @@ def update_order_status(request, order_id):
     return render(request, 'admin_dashboard/update_order_status.html', {'order': order})
 
 
+# def update_order_status(request, order_id):
+#     order = get_object_or_404(Order, id=order_id)
+
+#     if request.method == 'POST':
+#         new_status = request.POST.get('status')
+#         new_refund_status = request.POST.get('refund_status')
+
+#         order.status = new_status
+
+#         if order.is_refunded:  # ✅ Only allow refund_status update if refund was requested
+#             order.refund_status = new_refund_status
+
+#         order.save()
+#         return redirect('admin_dashboard')
+
+#     return render(request, 'admin_dashboard/update_order_status.html', {'order': order})
+
+def update_refund_status(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+    if request.method == 'POST':        
+        new_refund_status = request.POST.get('refund_status')
+        if order.is_refunded:  # ✅ Only allow refund_status update if refund was requested
+            order.refund_status = new_refund_status
+        order.save()
+        return redirect('admin_dashboard')
+    return render(request, 'admin_dashboard/update_refund_status.html', {'order': order})
+

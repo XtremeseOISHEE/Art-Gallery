@@ -44,10 +44,18 @@
                             <a href="{% url 'create_order' artwork.id %}">
                                 <button>Order Now</button>
                             </a>
+                            <a href="{% url 'add_to_cart' artwork.id %}">
+                                <button>Add to Cart</button>
+                            </a>
                         {% elif user.role == 'seller' and artwork.artist != user %}
                             <a href="{% url 'create_order' artwork.id %}">
                                 <button>Order Now</button>
+                                
                             </a>
+                            <a href="{% url 'add_to_cart' artwork.id %}">
+                                <button>Add to Cart</button>
+                            </a>
+
                         {% endif %}
                     {% endif %}
                 </div>

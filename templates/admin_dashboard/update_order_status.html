@@ -18,7 +18,18 @@
                 <option value="canceled" {% if order.status == 'canceled' %}selected{% endif %}>Canceled</option>
             </select>
         </div>
-
+        <!-- {% if order.is_refunded %}
+        <div style="margin-bottom: 15px;">
+            <label for="refund_status">Refund Status:</label><br>
+            <select name="refund_status" id="refund_status" style="padding: 8px; margin-top: 5px; width: 100%;">
+                <option value="pending" {% if order.refund_status == 'pending' %}selected{% endif %}>Pending</option>
+                <option value="approved" {% if order.refund_status == 'approved' %}selected{% endif %}>Approved</option>
+                <option value="rejected" {% if order.refund_status == 'rejected' %}selected{% endif %}>Rejected</option>
+            </select>
+        </div>
+        {% else %} -->
+            <p style="color: gray;">No refund was requested for this order.</p>
+        {% endif %}
         <button type="submit" style="padding: 10px 20px; background-color: #007bff; border: none; border-radius: 5px; color: white; font-weight: bold; cursor: pointer;">
             Update Status
         </button>

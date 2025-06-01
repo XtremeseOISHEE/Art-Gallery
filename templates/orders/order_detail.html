@@ -13,14 +13,29 @@
             <p class="card-text">Quantity: {{ order.quantity }}</p>
             <p class="card-text">Total Price: ${{ order.total_price }}</p>
             <p class="card-text">Status: <strong>{{ order.status|capfirst }}</strong></p>
+            
+            {% if order.is_refunded %}
+                <p class="card-text">Refund Status: <strong>Refund Requested</strong></p>
+            {% endif %}
         </div>
     </div>
 
     <div class="mt-5">
         <h3>Refund Information</h3>
         {% if order.is_refunded %}
-            <p>Refund Amount: ${{ order.refund_amount }}</p>
-            <p>Refund Reason: {{ order.refund_reason }}</p>
+            <p>Refund Request Amount: ${{ order.refund_amount }}</p>
+            <p>Refund Request Reason: {{ order.refund_reason }}</p>
+            <p>Refund Status: 
+                <strong>
+                {% if order.refund_status == 'approved' %}
+                    ✅ Approved
+                {% elif order.refund_status == 'rejected' %}
+                    ❌ Rejected
+                {% else %}
+                    ⏳ Pending
+                {% endif %}
+                </strong>
+            </p>
         {% else %}
             <p>No refund requested.</p>
 
