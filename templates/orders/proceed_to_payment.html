@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block content %}
+  <h2>Confirm Payment</h2>
+  <ul>
+    {% for item in items %}
+      <li>{{ item.artwork.title }} — Quantity: {{ item.quantity }} — Subtotal: {{ item.get_total_price }}৳</li>
+    {% endfor %}
+  </ul>
+
+  <p><strong>Total:</strong> {{ total_price }}৳</p>
+
+  <form method="POST" action="{% url 'finalize_payment' %}">
+    {% csrf_token %}
+    {% for item in items %}
+      <input type="hidden" name="selected_items" value="{{ item.id }}">
+    {% endfor %}
+    <button type="submit">💳 Pay Now</button>
+  </form>
+
+  <a href="{% url 'view_cart' %}">← Back to Cart</a>
+{% endblock %}

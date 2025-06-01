@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Your Cart</h2>
+
+  {% if items %}
+    <form method="post" action="{% url 'proceed_to_payment' %}">
+      {% csrf_token %}
+      <ul>
+        {% for item in items %}
+          <li>
+            <label>
+              <input type="checkbox" name="selected_items" value="{{ item.id }}">
+              <strong>{{ item.artwork.title }}</strong> –
+              Quantity: {{ item.quantity }} –
+              Total: {{ item.get_total_price }}৳
+            </label>
+          </li>
+        {% endfor %}
+      </ul>
+      <button type="submit">✅ Proceed to Payment</button>
+    </form>
+  {% else %}
+    <p>Your cart is empty 🛒</p>
+  {% endif %}
+
+  <br>
+  <a href="{% url 'artwork_list' %}" class="nav-link">← Back to Home</a>
+{% endblock %}
