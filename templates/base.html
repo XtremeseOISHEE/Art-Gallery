@@ -93,20 +93,20 @@
 {% endif %}
 
 
-            <ul class="navbar-nav ms-auto">
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                      
+{% if user.is_authenticated and user.username %}
+<ul class="navbar-nav ms-auto">
+    <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            {{ user.username }}
+        </a>
+        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+            <li><a class="dropdown-item" href="{% url 'view_profile' username=user.username %}">View Profile</a></li>
+            <li><a class="dropdown-item" href="{% url 'edit_profile' %}">Edit Profile</a></li>
+        </ul>
+    </li>
+</ul>
+{% endif %}
 
-                        {{ user.username }}
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                        <li><a class="dropdown-item" href="{% url 'view_profile' username=user.username %}">View Profile</a></li>
-                        <li><a class="dropdown-item" href="{% url 'edit_profile' %}">Edit Profile</a></li>
-                    </ul>
-                </li>
-            </ul>
-       
 
                     
                 </ul>

@@ -63,16 +63,17 @@ from django.db.models import Avg
 from users.models import User
 
 
-
 def view_profile(request, username):
     profile_user = get_object_or_404(User, username=username)
-    profile = profile_user.userprofile
+    profile = getattr(profile_user, 'userprofile', None)
 
     total_artworks = Artwork.objects.filter(artist=profile_user).count()
     total_sales = Order.objects.filter(artwork__artist=profile_user).count()
     avg_rating = profile_user.review_set.aggregate(Avg('rating'))['rating__avg']
 
     recent_artworks = Artwork.objects.filter(artist=profile_user).order_by('-created_at')[:3]
+
+    is_owner = request.user == profile_user
 
     return render(request, 'users/user_profile.html', {
         'user': profile_user,
@@ -81,6 +82,7 @@ def view_profile(request, username):
         'total_sales': total_sales,
         'avg_rating': round(avg_rating, 1) if avg_rating else None,
         'recent_artworks': recent_artworks,
+        'is_owner': is_owner,
     })
 
 

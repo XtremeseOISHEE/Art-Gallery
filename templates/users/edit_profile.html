@@ -3,46 +3,99 @@
 {% load widget_tweaks %}
 
 {% block content %}
-<div class="max-w-3xl mx-auto py-10 px-6">
-  <div style="background-color: black;">
-    <h2 class="text-2xl font-bold mb-6 text-center">Edit Your Profile</h2>
-    
-    <form method="POST" enctype="multipart/form-data" class="space-y-5">
-      {% csrf_token %}
-      
-      <!-- Full Name -->
-      <div>
-        <label class="block mb-1 font-medium">Full Name</label>
-        {{ form.full_name|add_class:"w-full border rounded-lg p-2" }}
-      </div>
-      
-      <!-- Address -->
-      <div>
-        <label class="block mb-1 font-medium">Address</label>
-        {{ form.address|add_class:"w-full border rounded-lg p-2" }}
-      </div>
+<div class="max-w-3xl mx-auto py-12 px-8 bg-black rounded-lg shadow-md">
+  <h2 class="text-3xl font-bold mb-8 text-white text-center">Edit Your Profile</h2>
+  
+  <form method="POST" enctype="multipart/form-data" class="space-y-6">
+    {% csrf_token %}
 
-      <!-- Bio -->
-      <div>
-        <label class="block mb-1 font-medium">Bio</label>
-        {{ form.bio|add_class:"w-full border rounded-lg p-2 h-24" }}
-      </div>
+    <!-- Full Name -->
+    <div>
+      <label for="full_name" class="block mb-2 font-semibold text-gray-200">Full Name</label>
+      <input type="text" id="full_name" name="full_name" value="{{ user.full_name }}" required
+             class="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+    </div>
 
-      <!-- Image Upload -->
-      <div>
-        <label class="block mb-1 font-medium">Profile Picture</label>
-        {{ form.image|add_class:"w-full" }}
-        {% if user.userprofile.image %}
-          <img src="{{ user.userprofile.image.url }}" class="w-24 h-24 rounded-full mt-2 object-cover" alt="Current Image">
-        {% endif %}
-      </div>
+    <!-- Email -->
+    <div>
+      <label for="email" class="block mb-2 font-semibold text-gray-200">Email</label>
+      <input type="email" id="email" name="email" value="{{ user.email }}" required
+             class="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+    </div>
 
-      <div class="text-center">
-        <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition">
-          Save Changes
-        </button>
-      </div>
-    </form>
-  </div>
+    <!-- Phone Number -->
+    <div>
+      <label for="id_phone_number" class="block mb-2 font-semibold text-gray-200">Phone Number</label>
+      {{ form.phone|add_class:"w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition" }}
+    </div>
+
+    <!-- Address -->
+    <div>
+      <label for="id_address" class="block mb-2 font-semibold text-gray-200">Address</label>
+      {{ form.address|add_class:"w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition" }}
+    </div>
+
+    <!-- City -->
+    <div>
+      <label for="id_city" class="block mb-2 font-semibold text-gray-200">City</label>
+      {{ form.city|add_class:"w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition" }}
+    </div>
+
+    <!-- State -->
+    <div>
+      <label for="id_state" class="block mb-2 font-semibold text-gray-200">State</label>
+      {{ form.state|add_class:"w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition" }}
+    </div>
+
+    <!-- Country -->
+    <div>
+      <label for="id_country" class="block mb-2 font-semibold text-gray-200">Country</label>
+      {{ form.country|add_class:"w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition" }}
+    </div>
+
+    <!-- Bio -->
+    <div>
+      <label for="id_bio" class="block mb-2 font-semibold text-gray-200">Bio</label>
+      {{ form.bio|add_class:"w-full border border-gray-300 rounded-md px-4 py-2 h-28 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 transition" }}
+    </div>
+
+    <!-- Social Links -->
+    <div>
+      <label for="id_facebook" class="block mb-2 font-semibold text-gray-200">Facebook</label>
+      {{ form.facebook|add_class:"w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition" }}
+    </div>
+
+    <div>
+      <label for="id_twitter" class="block mb-2 font-semibold text-gray-200">Twitter</label>
+      {{ form.twitter|add_class:"w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition" }}
+    </div>
+
+    <div>
+      <label for="id_instagram" class="block mb-2 font-semibold text-gray-200">Instagram</label>
+      {{ form.instagram|add_class:"w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition" }}
+    </div>
+
+    <div>
+      <label for="id_website" class="block mb-2 font-semibold text-gray-200">Website</label>
+      {{ form.website|add_class:"w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition" }}
+    </div>
+
+    <!-- Profile Picture -->
+    <div>
+      <label for="id_profile_picture" class="block mb-2 font-semibold text-gray-200">Profile Picture</label>
+      {{ form.profile_picture|add_class:"w-full" }}
+      {% if user.userprofile.profile_picture %}
+        <img src="{{ user.userprofile.profile_picture.url }}" alt="Current profile picture"
+             class="w-24 h-24 rounded-full mt-3 object-cover border border-gray-300 shadow-sm">
+      {% endif %}
+    </div>
+
+    <!-- Submit Button -->
+    <div class="text-center">
+      <button type="submit" class="bg-blue-600 text-white font-semibold px-8 py-3 rounded-md hover:bg-blue-700 transition shadow-md">
+        Save Changes
+      </button>
+    </div>
+  </form>
 </div>
 {% endblock %}
