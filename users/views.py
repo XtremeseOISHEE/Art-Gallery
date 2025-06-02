@@ -76,7 +76,7 @@ def view_profile(request, username):
     is_owner = request.user == profile_user
 
     return render(request, 'users/user_profile.html', {
-        'user': profile_user,
+        'profile_user': profile_user,
         'profile': profile,
         'total_artworks': total_artworks,
         'total_sales': total_sales,
