@@ -6,6 +6,8 @@ from django.shortcuts import render, get_object_or_404
 from .models import User
 from django.contrib.auth.decorators import user_passes_test
 
+
+
 def staff_or_admin_required(view_func):
     return user_passes_test(
         lambda u: u.is_authenticated and (u.is_superuser or u.role == 'staff')
@@ -53,10 +55,35 @@ def logout_view(request):
 
 
 
+from django.shortcuts import render, get_object_or_404
+from .models import UserProfile
+from artworks.models import Artwork
+from orders.models import Order
+from django.db.models import Avg
+from users.models import User
+
+
 def view_profile(request, username):
-    user = get_object_or_404(User, username=username)
-    profile = getattr(user, 'userprofile', None)
-    return render(request, 'users/view_profile.html', {'profile': profile, 'user_obj': user})
+    profile_user = get_object_or_404(User, username=username)
+    profile = getattr(profile_user, 'userprofile', None)
+
+    total_artworks = Artwork.objects.filter(artist=profile_user).count()
+    total_sales = Order.objects.filter(artwork__artist=profile_user).count()
+    avg_rating = profile_user.review_set.aggregate(Avg('rating'))['rating__avg']
+
+    recent_artworks = Artwork.objects.filter(artist=profile_user).order_by('-created_at')[:3]
+
+    is_owner = request.user == profile_user
+
+    return render(request, 'users/user_profile.html', {
+    'profile_user': profile_user,  # Don't use 'user' here
+    'profile': profile,
+    'total_artworks': total_artworks,
+    'total_sales': total_sales,
+    'avg_rating': round(avg_rating, 1) if avg_rating else None,
+    'recent_artworks': recent_artworks,
+    'is_owner': is_owner,
+})
 
 
 from django.shortcuts import render, redirect
@@ -73,11 +100,14 @@ def edit_profile(request):
     profile = request.user.userprofile
 
     if request.method == 'POST':
-        form = UserProfileForm(request.POST, instance=profile)
+        form = UserProfileForm(request.POST, request.FILES, instance=profile)
         if form.is_valid():
             form.save()
-            return redirect('user_profile')
+            return redirect('view_profile', username=request.user.username)
+
     else:
         form = UserProfileForm(instance=profile)
 
     return render(request, 'users/edit_profile.html', {'form': form})
+    #return redirect('view_profile', username=request.user.username)
+

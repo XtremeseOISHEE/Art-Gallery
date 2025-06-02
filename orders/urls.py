@@ -1,6 +1,6 @@
 from django.urls import path
 from . import views
-from .views import finalize_payment
+from .views import finalize_payment, cart_order_confirm
 
 urlpatterns = [
     path('create/<int:artwork_id>/', views.create_order, name='create_order'),
@@ -14,4 +14,5 @@ urlpatterns = [
     path('order/<int:order_id>/confirm/', views.order_confirm, name='order_confirm'),
     path('order/<int:pk>/', views.order_detail, name='order_detail'),
     path('cart/finalize/', finalize_payment, name='finalize_payment'),
+    path('cart/confirm/', cart_order_confirm, name='cart_order_confirm'),
 ]

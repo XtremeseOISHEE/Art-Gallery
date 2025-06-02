@@ -163,8 +163,11 @@ from .models import Cart, Order  # Make sure you import Order and Cart models
 @login_required
 def finalize_payment(request):
     if request.method == 'POST':
-        selected_item_ids = request.POST.getlist('selected_items')
-        
+        selected_item_ids = request.session.get('selected_item_ids')
+        delivery_name = request.session.get('delivery_name')
+        delivery_phone = request.session.get('delivery_phone')
+        delivery_address = request.session.get('delivery_address')
+
         if not selected_item_ids:
             messages.error(request, "No items were selected.")
             return redirect('view_cart')
@@ -181,15 +184,23 @@ def finalize_payment(request):
                 user=request.user,
                 artwork=item.artwork,
                 quantity=item.quantity,
-                total_price=item.get_total_price()
+                total_price=item.get_total_price(),
+                delivery_name=delivery_name,
+                delivery_phone=delivery_phone,
+                delivery_address=delivery_address,
             )
-            item.delete()  # Remove item from cart after ordering
+            item.delete()  # Remove item from cart
 
-        messages.success(request, "Your orders have been placed successfully!")
-        return redirect('order_list')  # Adjust this to your order list view name
+        # Clear session data
+        request.session.pop('selected_item_ids', None)
+        request.session.pop('delivery_name', None)
+        request.session.pop('delivery_phone', None)
+        request.session.pop('delivery_address', None)
+        request.session.pop('total_price', None)
+
+        return render(request, 'orders/finalize_payment.html')
 
     return HttpResponseBadRequest("Invalid request method.")
-
 
 
 @login_required
@@ -225,3 +236,49 @@ def reject_refund(request, pk):
         order.save()
         messages.success(request, 'Refund rejected.')
     return redirect('order_detail', pk=pk)
+
+@login_required
+def cart_order_confirm(request):
+    selected_item_ids = request.session.get('selected_item_ids')
+    total_price = request.session.get('total_price')
+
+    if not selected_item_ids or not total_price:
+        messages.error(request, "Something went wrong. Please try again.")
+        return redirect('view_cart')
+
+    cart = get_object_or_404(Cart, user=request.user)
+    items = cart.items.filter(id__in=selected_item_ids)
+
+    if request.method == "POST":
+        name = request.POST.get("name")
+        phone = request.POST.get("phone")
+        address = request.POST.get("address")
+
+        if not all([name, phone, address]):
+            messages.error(request, "Please fill in all delivery details.")
+            return render(request, 'orders/cart_order_confirm.html', {'items': items, 'total_price': total_price})
+
+        # ✅ Create orders here (moved from finalize_payment)
+        for item in items:
+            Order.objects.create(
+                user=request.user,
+                artwork=item.artwork,
+                quantity=item.quantity,
+                total_price=item.get_total_price(),
+                delivery_name=name,
+                delivery_phone=phone,
+                delivery_address=address,
+            )
+            item.delete()  # Remove item from cart
+
+        # Clear session
+        request.session.pop('selected_item_ids', None)
+        request.session.pop('delivery_name', None)
+        request.session.pop('delivery_phone', None)
+        request.session.pop('delivery_address', None)
+        request.session.pop('total_price', None)
+
+        messages.success(request, "Your order was placed successfully!")
+        return redirect('order_list')  # or redirect to order success page
+
+    return render(request, 'orders/cart_order_confirm.html', {'items': items, 'total_price': total_price})

@@ -9,7 +9,7 @@
 
   <p><strong>Total:</strong> {{ total_price }}৳</p>
 
-  <form method="POST" action="{% url 'finalize_payment' %}">
+  <form method="POST" action="{% url 'cart_order_confirm' %}">
     {% csrf_token %}
     {% for item in items %}
       <input type="hidden" name="selected_items" value="{{ item.id }}">
