@@ -76,14 +76,14 @@ def view_profile(request, username):
     is_owner = request.user == profile_user
 
     return render(request, 'users/user_profile.html', {
-    'profile_user': profile_user,  # Don't use 'user' here
-    'profile': profile,
-    'total_artworks': total_artworks,
-    'total_sales': total_sales,
-    'avg_rating': round(avg_rating, 1) if avg_rating else None,
-    'recent_artworks': recent_artworks,
-    'is_owner': is_owner,
-})
+        'profile_user': profile_user,
+        'profile': profile,
+        'total_artworks': total_artworks,
+        'total_sales': total_sales,
+        'avg_rating': round(avg_rating, 1) if avg_rating else None,
+        'recent_artworks': recent_artworks,
+        'is_owner': is_owner,
+    })
 
 
 from django.shortcuts import render, redirect

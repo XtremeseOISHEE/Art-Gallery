@@ -15,19 +15,23 @@
         {% endif %}
       </div>
 
-      <h2 class="text-3xl font-semibold mt-4 text-gray-100">{{ user.username }}</h2>
-     <h3> <p class="text-gray-400 uppercase tracking-wide mt-1" style="color: deeppink;">{{ user.role|default:"User"|title }}</p> </h3>
+      <h2 class="text-3xl font-semibold mt-4 text-gray-100">{{ profile_user.username }}</h2>
+      <h3>
+        <p class="text-gray-400 uppercase tracking-wide mt-1" style="color: deeppink;">
+          {{ profile_user.role|default:"User"|title }}
+        </p>
+      </h3>
     </div>
 
     <!-- Profile Info -->
     <div class="md:w-2/3 mt-8 md:mt-0 text-gray-300 space-y-5">
       <div>
         <h3 class="text-lg font-medium text-gray-200">Full Name</h3>
-        <p>{{ user.full_name|default:"Not Provided" }}</p>
+        <p>{{ profile_user.full_name|default:"Not Provided" }}</p>
       </div>
       <div>
         <h3 class="text-lg font-medium text-gray-200">Email</h3>
-        <p>{{ user.email }}</p>
+        <p>{{ profile_user.email }}</p>
       </div>
       <div>
         <h3 class="text-lg font-medium text-gray-200">Phone Number</h3>
@@ -37,7 +41,7 @@
         <h3 class="text-lg font-medium text-gray-200">Address</h3>
         <p>
           {{ profile.address|default:"Not Provided" }}<br>
-          {{ profile.city|default:"" }}  {{ profile.state|default:"" }}<br>
+          {{ profile.city|default:"" }} {{ profile.state|default:"" }}<br>
           {{ profile.country|default:"" }}
         </p>
       </div>
@@ -61,25 +65,22 @@
           {% if profile.website %}
             <li><a href="{{ profile.website }}" target="_blank" class="hover:underline">Website</a></li>
           {% endif %}
-          
+
           {% if not profile.facebook and not profile.twitter and not profile.instagram and not profile.website %}
             <li class="text-gray-500">Not Provided</li>
           {% endif %}
         </ul>
-
-
       </div>
 
-      {% if user == request.user %}
-    <div class="mt-10 text-center">
-      <a href="{% url 'edit_profile' %}" class="btn btn-logout">
-       
-        Edit Profile
-      </a>
-    </div>
-  {% endif %}
-     
-      {% if user.role == 'seller' %}
+      {% if profile_user == request.user %}
+        <div class="mt-10 text-center">
+          <a href="{% url 'edit_profile' %}" class="btn btn-logout">
+            Edit Profile
+          </a>
+        </div>
+      {% endif %}
+
+      {% if profile_user.role == 'seller' %}
         <div class="mt-6 bg-gray-800 p-5 rounded-md shadow-md">
           <h3 class="text-lg font-semibold text-white mb-2">Stats</h3>
           <ul class="list-disc list-inside text-gray-300 space-y-1">
@@ -92,7 +93,7 @@
     </div>
   </div>
 
-  {% if user.role == 'seller' and recent_artworks %}
+  {% if profile_user.role == 'seller' and recent_artworks %}
     <div class="mt-10">
       <h3 class="text-xl font-semibold text-white mb-4">🎨 Recent Artworks</h3>
       <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -110,7 +111,5 @@
       </div>
     </div>
   {% endif %}
-
-  
 </div>
 {% endblock %}
