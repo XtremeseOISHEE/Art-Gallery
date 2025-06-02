@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'admin_dashboard',
     'payments',
     'reviews',
+    'widget_tweaks',
 ]
 
 MIDDLEWARE = [
