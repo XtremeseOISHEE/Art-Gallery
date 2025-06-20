@@ -329,12 +329,11 @@ def homepage(request):
     if request.user.is_authenticated:
         notifications_count = request.user.notifications.filter(unread=True).count()
     
-   
     context = {
-       
         'notifications_count': notifications_count,
     }
-    return render(request, 'artworks/home.html')
+    return render(request, 'artworks/home.html', context)
+
 
 
 

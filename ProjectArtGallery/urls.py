@@ -24,12 +24,14 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('users/', include('users.urls')),
     path('', include('artworks.urls')), 
-    path('artworks/', include('artworks.urls')),
+    
     path('orders/', include('orders.urls')),
     path('reviews/', include('reviews.urls')),
     path('admin-dashboard/', include('admin_dashboard.urls')), 
     path('payments/', include('payments.urls')),
     path('notifications/', include('notifications.urls')),
+    path('messages/', include('messaging.urls')),
+
 
 ]
 

@@ -3,99 +3,73 @@
 {% load widget_tweaks %}
 
 {% block content %}
-<div class="max-w-3xl mx-auto py-12 px-8 bg-black rounded-lg shadow-md">
-  <h2 class="text-3xl font-bold mb-8 text-white text-center">Edit Your Profile</h2>
-  
-  <form method="POST" enctype="multipart/form-data" class="space-y-6">
+<div style="max-width: 600px; margin: 40px auto; padding: 30px; background-color: #222; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.7); font-family: Arial, sans-serif; color: #eee;">
+  <h2 style="text-align: center; margin-bottom: 30px; font-size: 2rem; font-weight: 700;">Edit Your Profile</h2>
+
+  <form method="POST" enctype="multipart/form-data" style="display: flex; flex-direction: column; gap: 20px;">
     {% csrf_token %}
 
-    <!-- Full Name -->
-    <div>
-      <label for="full_name" class="block mb-2 font-semibold text-gray-200">Full Name</label>
-      <input type="text" id="full_name" name="full_name" value="{{ user.full_name }}" required
-             class="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
-    </div>
+    <label for="full_name" style="font-weight: 600;">Full Name</label>
+    <input type="text" id="full_name" name="full_name" value="{{ user.full_name }}" required
+           style="width: 100%; padding: 10px; border-radius: 6px; border: 1.5px solid #555; background-color: #333; color: #eee; outline: none; transition: border-color 0.3s;">
 
-    <!-- Email -->
-    <div>
-      <label for="email" class="block mb-2 font-semibold text-gray-200">Email</label>
-      <input type="email" id="email" name="email" value="{{ user.email }}" required
-             class="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
-    </div>
+    <label for="email" style="font-weight: 600;">Email</label>
+    <input type="email" id="email" name="email" value="{{ user.email }}" required
+           style="width: 100%; padding: 10px; border-radius: 6px; border: 1.5px solid #555; background-color: #333; color: #eee; outline: none; transition: border-color 0.3s;">
 
-    <!-- Phone Number -->
-    <div>
-      <label for="id_phone_number" class="block mb-2 font-semibold text-gray-200">Phone Number</label>
-      {{ form.phone|add_class:"w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition" }}
-    </div>
+    <label for="id_phone_number" style="font-weight: 600;">Phone Number</label>
+    {{ form.phone|add_class:"w-full px-3 py-2 rounded-md border border-gray-600 bg-[#333] text-[#eee] focus:outline-none focus:border-green-600" }}
 
-    <!-- Address -->
-    <div>
-      <label for="id_address" class="block mb-2 font-semibold text-gray-200">Address</label>
-      {{ form.address|add_class:"w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition" }}
-    </div>
+    <label for="id_address" style="font-weight: 600;">Address</label>
+    {{ form.address|add_class:"w-full px-3 py-2 rounded-md border border-gray-600 bg-[#333] text-[#eee] focus:outline-none focus:border-green-600" }}
 
-    <!-- City -->
-    <div>
-      <label for="id_city" class="block mb-2 font-semibold text-gray-200">City</label>
-      {{ form.city|add_class:"w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition" }}
-    </div>
+    <label for="id_city" style="font-weight: 600;">City</label>
+    {{ form.city|add_class:"w-full px-3 py-2 rounded-md border border-gray-600 bg-[#333] text-[#eee] focus:outline-none focus:border-green-600" }}
 
-    <!-- State -->
-    <div>
-      <label for="id_state" class="block mb-2 font-semibold text-gray-200">State</label>
-      {{ form.state|add_class:"w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition" }}
-    </div>
+    <label for="id_state" style="font-weight: 600;">State</label>
+    {{ form.state|add_class:"w-full px-3 py-2 rounded-md border border-gray-600 bg-[#333] text-[#eee] focus:outline-none focus:border-green-600" }}
 
-    <!-- Country -->
-    <div>
-      <label for="id_country" class="block mb-2 font-semibold text-gray-200">Country</label>
-      {{ form.country|add_class:"w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition" }}
-    </div>
+    <label for="id_country" style="font-weight: 600;">Country</label>
+    {{ form.country|add_class:"w-full px-3 py-2 rounded-md border border-gray-600 bg-[#333] text-[#eee] focus:outline-none focus:border-green-600" }}
 
-    <!-- Bio -->
-    <div>
-      <label for="id_bio" class="block mb-2 font-semibold text-gray-200">Bio</label>
-      {{ form.bio|add_class:"w-full border border-gray-300 rounded-md px-4 py-2 h-28 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 transition" }}
-    </div>
+    <label for="id_bio" style="font-weight: 600;">Bio</label>
+    {{ form.bio|add_class:"w-full px-3 py-2 rounded-md border border-gray-600 bg-[#333] text-[#eee] h-28 resize-none focus:outline-none focus:border-green-600" }}
 
-    <!-- Social Links -->
-    <div>
-      <label for="id_facebook" class="block mb-2 font-semibold text-gray-200">Facebook</label>
-      {{ form.facebook|add_class:"w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition" }}
-    </div>
+    <label for="id_facebook" style="font-weight: 600;">Facebook</label>
+    {{ form.facebook|add_class:"w-full px-3 py-2 rounded-md border border-gray-600 bg-[#333] text-[#eee] focus:outline-none focus:border-green-600" }}
 
-    <div>
-      <label for="id_twitter" class="block mb-2 font-semibold text-gray-200">Twitter</label>
-      {{ form.twitter|add_class:"w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition" }}
-    </div>
+    <label for="id_twitter" style="font-weight: 600;">Twitter</label>
+    {{ form.twitter|add_class:"w-full px-3 py-2 rounded-md border border-gray-600 bg-[#333] text-[#eee] focus:outline-none focus:border-green-600" }}
 
-    <div>
-      <label for="id_instagram" class="block mb-2 font-semibold text-gray-200">Instagram</label>
-      {{ form.instagram|add_class:"w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition" }}
-    </div>
+    <label for="id_instagram" style="font-weight: 600;">Instagram</label>
+    {{ form.instagram|add_class:"w-full px-3 py-2 rounded-md border border-gray-600 bg-[#333] text-[#eee] focus:outline-none focus:border-green-600" }}
 
-    <div>
-      <label for="id_website" class="block mb-2 font-semibold text-gray-200">Website</label>
-      {{ form.website|add_class:"w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition" }}
-    </div>
+    <label for="id_website" style="font-weight: 600;">Website</label>
+    {{ form.website|add_class:"w-full px-3 py-2 rounded-md border border-gray-600 bg-[#333] text-[#eee] focus:outline-none focus:border-green-600" }}
 
-    <!-- Profile Picture -->
-    <div>
-      <label for="id_profile_picture" class="block mb-2 font-semibold text-gray-200">Profile Picture</label>
-      {{ form.profile_picture|add_class:"w-full" }}
-      {% if user.userprofile.profile_picture %}
-        <img src="{{ user.userprofile.profile_picture.url }}" alt="Current profile picture"
-             class="w-24 h-24 rounded-full mt-3 object-cover border border-gray-300 shadow-sm">
-      {% endif %}
-    </div>
+    <label for="id_profile_picture" style="font-weight: 600;">Profile Picture</label>
+    {{ form.profile_picture|add_class:"w-full" }}
 
-    <!-- Submit Button -->
-    <div class="text-center">
-      <button type="submit" class="bg-blue-600 text-white font-semibold px-8 py-3 rounded-md hover:bg-blue-700 transition shadow-md">
-        Save Changes
-      </button>
-    </div>
+    {% if user.userprofile.profile_picture %}
+      <img src="{{ user.userprofile.profile_picture.url }}" alt="Current profile picture" 
+           style="width: 96px; height: 96px; border-radius: 50%; object-fit: cover; margin-top: 15px; border: 2px solid #4ade80;">
+    {% endif %}
+
+    <button type="submit" style="
+      margin-top: 25px;
+      background-color: #22c55e;
+      color: #111;
+      font-weight: 700;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    "
+    onmouseover="this.style.backgroundColor='#16a34a'"
+    onmouseout="this.style.backgroundColor='#22c55e'">
+      Save Changes
+    </button>
   </form>
 </div>
 {% endblock %}
