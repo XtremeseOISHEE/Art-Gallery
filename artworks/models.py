@@ -47,9 +47,25 @@ class Artwork(models.Model):
         return self.title
 
 
+
 @property
 def average_rating(self):
     reviews = self.reviews.all()
     if reviews:
         return round(sum([review.rating for review in reviews]) / reviews.count(), 2)
     return 0
+
+
+from django.db import models
+from django.conf import settings
+
+class ArtworkLike(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    artwork = models.ForeignKey('Artwork', on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+class ArtworkComment(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    artwork = models.ForeignKey('Artwork', on_delete=models.CASCADE)
+    comment = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)

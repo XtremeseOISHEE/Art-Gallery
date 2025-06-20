@@ -16,11 +16,10 @@
   <p><strong>Price:</strong> ${{ artwork.price }}</p>
   <p><strong>Category:</strong> {{ artwork.category }}</p>
   <p><strong>Artist:</strong> 
-  <a href="{% url 'view_profile' artwork.artist.username %}">
-    {{ artwork.artist.username }}
-  </a>
+    <a href="{% url 'view_profile' artwork.artist.username %}">
+      {{ artwork.artist.username }}
+    </a>
   </p>
-
 
   {% if user == artwork.artist %}
     <p>
@@ -42,7 +41,7 @@
       <button type="submit" style="background-color: #007BFF; color: white; padding: 10px 15px; border: none; border-radius: 5px;">Order Now</button>
     </form>
     <a href="{% url 'add_to_cart' artwork.id %}">
-    <button type="submit" style="background-color: #007BFF; color: white; padding: 10px 15px; border: none; border-radius: 5px;">Add to Cart</button>
+      <button type="submit" style="background-color: #007BFF; color: white; padding: 10px 15px; border: none; border-radius: 5px;">Add to Cart</button>
     </a>
   {% endif %}
 
@@ -66,14 +65,12 @@
           {% csrf_token %}
           <button type="submit" style="background: none; border: none; color: red; cursor: pointer;">Delete</button>
         </form> |
-        <a href="{% url 'edit_review' review.id %}">Edit</a>
+        <a href="{% url 'edit_review' review.id %}">Edit</a> |
       {% endif %}
-
-      <p>👍 {{ review.likes_count }} | 👎 {{ review.dislikes_count }}</p>
-
-      <p>
-        <a href="{% url 'like_review' review.id %}?like=1">Like</a> |
-        <a href="{% url 'like_review' review.id %}?like=0">Dislike</a>
+      
+      <!-- Like / Dislike Links for review -->
+      <a href="{% url 'like_review' review.id %}?like=1">Like</a> |
+      <a href="{% url 'like_review' review.id %}?like=0">Dislike</a>
       </p>
 
       <h4 style="margin-top: 10px;">Comments:</h4>
@@ -120,50 +117,51 @@
       </button>
     </div>
   </form>
-{% else %}
+  {% else %}
   <p><a href="{% url 'login' %}">Login</a> to post a review.</p>
-{% endif %}
+  {% endif %}
+</div>
+
 <style>
-    textarea, input[type="text"], input[type="number"], select {
-      width: 100%;
-      max-width: 100%;
-      padding: 8px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      box-sizing: border-box;
-      display: block;
-      margin-top: 5px;
-    }
-  
-    form p {
-      margin-bottom: 15px;
-    }
-  
-    .review-form {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      height: 280px; /* Adjust height as needed */
-    }
-  
-    .review-form .fields {
-      flex: 1;
-    }
-  
-    .review-form .submit-btn {
-      text-align: right;
-    }
-  
-    .review-form button {
-      background-color: #28a745;
-      color: white;
-      padding: 8px 16px;
-      border: none;
-      border-radius: 5px;
-      font-size: 16px;
-      cursor: pointer;
-    }
-  </style>
-  
+  textarea, input[type="text"], input[type="number"], select {
+    width: 100%;
+    max-width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    display: block;
+    margin-top: 5px;
+  }
+
+  form p {
+    margin-bottom: 15px;
+  }
+
+  .review-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    height: 280px; /* Adjust height as needed */
+  }
+
+  .review-form .fields {
+    flex: 1;
+  }
+
+  .review-form .submit-btn {
+    text-align: right;
+  }
+
+  .review-form button {
+    background-color: #28a745;
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+  }
+</style>
 
 {% endblock %}

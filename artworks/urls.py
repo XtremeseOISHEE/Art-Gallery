@@ -13,4 +13,6 @@ urlpatterns = [
     path('my-arts/', views.my_artworks, name='my_artworks'),
     path('admin/pending-artworks/', views.pending_artworks, name='pending_artworks'),
     path('admin/approve-artwork/<int:pk>/', views.artwork_approve, name='artwork_approve'),
+    path('artwork/<int:artwork_id>/like/', views.like_artwork, name='like_artwork'),
+    path('', views.homepage, name='homepage'),
 ]

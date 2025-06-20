@@ -12,9 +12,9 @@ from django.contrib import messages
 
 from .models import Artwork, CATEGORY_CHOICES, ART_TYPE_CHOICES
 
-
 def homepage(request):
     return render(request, 'artworks/home.html')
+
 
 def is_staff(user):
     return user.is_staff
@@ -322,7 +322,18 @@ def my_artworks(request):
 
 from django.shortcuts import render
 
+from django.shortcuts import render
+
 def homepage(request):
+    notifications_count = 0
+    if request.user.is_authenticated:
+        notifications_count = request.user.notifications.filter(unread=True).count()
+    
+   
+    context = {
+       
+        'notifications_count': notifications_count,
+    }
     return render(request, 'artworks/home.html')
 
 
@@ -350,3 +361,14 @@ def pending_artworks(request):
 #     artwork.save()
     
 #     return redirect('pending_artworks')  # Redirect to the pending artworks page after approving
+
+
+from notifications.models import Notification
+
+def like_artwork(request, artwork_id):
+    artwork = get_object_or_404(Artwork, pk=artwork_id)
+    Notification.objects.create(
+        recipient=artwork.artist,
+        actor=request.user,
+        verb="liked your artwork"
+    )
