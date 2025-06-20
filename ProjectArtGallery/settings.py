@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.humanize',
     'users',
     'artworks',
     'orders',
@@ -45,6 +46,8 @@ INSTALLED_APPS = [
     'payments',
     'reviews',
     'widget_tweaks',
+    'notifications',
+    
 ]
 
 MIDDLEWARE = [
@@ -69,6 +72,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'notifications.context_processors.unread_notifications',
             ],
         },
     },

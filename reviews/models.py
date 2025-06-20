@@ -101,5 +101,3 @@ class ReviewComment(models.Model):
     def get_comment_length(self):
         """Returns the length of the comment."""
         return len(self.comment)
-
-

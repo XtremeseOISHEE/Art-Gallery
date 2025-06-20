@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}My Notifications{% endblock %}
+
+{% block content %}
+<h2>Notifications</h2>
+
+<ul class="list-group">
+  {% for n in notifications %}
+    <li class="list-group-item">
+      {{ n.actor }} {{ n.verb }} {% if n.target %} "{{ n.target }}" {% endif %}
+      <small class="text-muted">- {{ n.timestamp|naturaltime }}</small>
+    </li>
+  {% empty %}
+    <li class="list-group-item">No notifications.</li>
+  {% endfor %}
+</ul>
+{% endblock %}

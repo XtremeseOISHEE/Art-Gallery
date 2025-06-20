@@ -29,8 +29,8 @@ urlpatterns = [
     path('reviews/', include('reviews.urls')),
     path('admin-dashboard/', include('admin_dashboard.urls')), 
     path('payments/', include('payments.urls')),
+    path('notifications/', include('notifications.urls')),
 
-    
 ]
 
 if settings.DEBUG:
