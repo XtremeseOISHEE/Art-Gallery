@@ -12,7 +12,7 @@ from django.contrib import messages
 
 from .models import Artwork, CATEGORY_CHOICES, ART_TYPE_CHOICES
 
-def homepage(request):
+def home(request):
     return render(request, 'artworks/home.html')
 
 
@@ -324,7 +324,7 @@ from django.shortcuts import render
 
 from django.shortcuts import render
 
-def homepage(request):
+def home(request):
     notifications_count = 0
     if request.user.is_authenticated:
         notifications_count = request.user.notifications.filter(unread=True).count()
