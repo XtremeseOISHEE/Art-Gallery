@@ -1,5 +1,6 @@
 from django import forms
 from .models import Artwork
+from .models import Artwork, SIZE_CHOICES, PIXEL_SIZE_CHOICES
 
 # class ArtworkForm(forms.ModelForm):
 #     class Meta:
@@ -11,9 +12,9 @@ class ArtworkForm(forms.ModelForm):
         model = Artwork
         fields = ['title', 'image', 'description', 'price', 'categories', 'art_type', 'size', 'custom_size']
         widgets = {
-            'categories': forms.CheckboxSelectMultiple(),
+             'categories': forms.SelectMultiple()
         }
-        
+       
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
