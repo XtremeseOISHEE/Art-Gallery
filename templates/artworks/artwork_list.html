@@ -36,7 +36,7 @@
                 <div class="artwork-card">
                     <a href="{% url 'artwork_detail' artwork.pk %}"><img src="{{ artwork.image.url }}" alt="{{ artwork.title }}" width="200px"></a>
                     <h3><a href="{% url 'artwork_detail' artwork.pk %}">{{ artwork.title }}</a></h3>
-                    <p><strong>Price:</strong> ${{ artwork.price }}</p>
+                    <p><strong>Price:</strong> ৳{{ artwork.price }}</p>
 
                     <!-- Add the Order Now button for buyers or other sellers -->
                     {% if user.is_authenticated %}

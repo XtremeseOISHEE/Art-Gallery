@@ -1,12 +1,23 @@
 from django.db import models
 from django.conf import settings
 
+
+# 
+from django.db import models
+
+class Category(models.Model):
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
+# 
+
 CATEGORY_CHOICES = [
     ('abstract', 'Abstract'),
     ('landscape', 'Landscape'),
     ('portrait', 'Portrait'),
     ('fantasy', 'Fantasy'),
-    ('anime', 'Anime / Manga'),
+    ('food', 'Food'),
     ('nature', 'Nature'),
     ('cityscape', 'Cityscape / Urban'),
     ('animals', 'Animals / Wildlife'),
@@ -24,11 +35,49 @@ ART_TYPE_CHOICES = [
     ('traditional', 'Traditional Art'),
     ('3d', '3D Art / Sculpting'),
     ('photography', 'Photography'),
-    ('fanart', 'Fan Art'),
     ('illustration', 'Illustration'),
-    ('concept_art', 'Concept Art'),
-    ('pixel_art', 'Pixel Art'),
+    ('poster', 'Poster'),
+    ('exclusive_paintings', 'Exclusive Paintings'),
+    ('handmade_crafts', 'Handmade Crafts'),
+    ('print', 'Print'),
 ]
+# maryam
+ART_TYPE_CHOICES = [
+    ('traditional', 'Traditional Art'),
+    ('photography', 'Photography'),
+    ('poster', 'Poster'),
+    ('exclusive_paintings', 'Exclusive Paintings'),
+    ('print', 'Print'),
+    ('digital', 'Digital Art'),
+    ('illustration', 'Illustration'),
+    ('3d', '3D Art / Sculpting'),
+    ('handmade_crafts', 'Handmade Crafts'),
+]
+
+SIZE_CHOICES = [
+    ('A4', 'A4 (8.3×11.7 in)'),
+    ('A3', 'A3 (11.7×16.5 in)'),
+    ('A2', 'A2 (16.5×23.4 in)'),
+    ('A1', 'A1 (23.4×33.1 in)'),
+    ('18x24', '18×24 in'),
+    ('24x36', '24×36 in'),
+]
+
+PIXEL_SIZE_CHOICES = [
+    ('1080x1350', '1080×1350 px'),
+    ('1080x1080', '1080×1080 px'),
+    ('1920x1080', '1920×1080 px'),
+    ('3508x4961', '3508×4961 px (A4 @ 300dpi)'),
+]
+
+FRAME_CHOICES = [
+    ('none', 'No Frame'),
+    ('wood', 'Wood Frame (+৳300)'),
+    ('metal', 'Metal Frame (+৳350)'),
+    ('acrylic', 'Acrylic Frame (+৳250)'),
+]
+
+
 
 class Artwork(models.Model):
     title = models.CharField(max_length=255)
@@ -42,6 +91,12 @@ class Artwork(models.Model):
     is_available = models.BooleanField(default=True)
     is_approved = models.BooleanField(default=False)
     views = models.PositiveIntegerField(default=0)  # Track popularity
+    # maryam
+    categories = models.ManyToManyField(Category)
+    art_type = models.CharField(max_length=30, choices=ART_TYPE_CHOICES)
+    size = models.CharField(max_length=20, choices=SIZE_CHOICES, blank=True, null=True)
+    custom_size = models.CharField(max_length=100, blank=True, null=True)
+    frame = models.CharField(max_length=20, choices=FRAME_CHOICES, default='none')
 
     def __str__(self):
         return self.title
