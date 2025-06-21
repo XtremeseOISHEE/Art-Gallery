@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block content %}
+<style>
+  .chat-container {
+    background-color: #2b2b3d;
+    color: #f1f1f1;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);
+  }
+
+  .chat-title {
+    text-align: center;
+    color: #f7c59f;
+    font-weight: 600;
+    margin-bottom: 25px;
+  }
+
+  .chat-box {
+    background: #1e1e2f;
+    border-radius: 12px;
+    padding: 20px;
+    height: 400px;
+    overflow-y: scroll;
+    margin-bottom: 20px;
+  }
+
+  .chat-bubble {
+    display: inline-block;
+    padding: 10px 15px;
+    border-radius: 20px;
+    max-width: 70%;
+    word-wrap: break-word;
+    margin-bottom: 10px;
+  }
+
+  .from-me {
+    background: #4a90e2;
+    color: white;
+    text-align: right;
+    float: right;
+    clear: both;
+  }
+
+  .from-them {
+    background: #44475a;
+    color: #f1f1f1;
+    text-align: left;
+    float: left;
+    clear: both;
+  }
+
+  .timestamp {
+    font-size: 0.75rem;
+    color: #bbb;
+    margin-top: 3px;
+    display: block;
+  }
+
+  textarea {
+    background: #1e1e2f;
+    border: 1px solid #555;
+    color: #f1f1f1;
+    border-radius: 10px;
+    padding: 10px;
+    width: 100%;
+    resize: none;
+    margin-bottom: 10px;
+  }
+
+  .btn-send {
+    background: linear-gradient(135deg, #00b09b, #96c93d);
+    border: none;
+    padding: 10px 25px;
+    color: white;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: background 0.3s ease;
+  }
+
+  .btn-send:hover {
+    background: linear-gradient(135deg, #96c93d, #00b09b);
+  }
+</style>
+
+<div class="container mt-5 chat-container">
+  <h2 class="chat-title">💬 Chat with {{ other_user.get_full_name|default:other_user.username }}</h2>
+
+  <div class="chat-box">
+    {% for msg in messages %}
+      {% if msg.sender == request.user %}
+        <div class="chat-bubble from-me">
+          {{ msg.content }}
+          <span class="timestamp">{{ msg.timestamp|naturaltime }}</span>
+        </div>
+      {% else %}
+        <div class="chat-bubble from-them">
+          {{ msg.content }}
+          <span class="timestamp">{{ msg.timestamp|naturaltime }}</span>
+        </div>
+      {% endif %}
+    {% empty %}
+      <p class="text-center text-muted">No messages yet. Start the conversation!</p>
+    {% endfor %}
+  </div>
+
+  <form method="post">
+    {% csrf_token %}
+    <textarea name="content" rows="3" placeholder="Type your message here..."></textarea>
+    <button type="submit" class="btn-send">Send</button>
+  </form>
+</div>
+{% endblock %}

@@ -11,7 +11,7 @@
         <div class="card-body">
             <h5 class="card-title">{{ order.artwork.title }}</h5>
             <p class="card-text">Quantity: {{ order.quantity }}</p>
-            <p class="card-text">Total Price: ${{ order.total_price }}</p>
+            <p class="card-text">Total Price: ৳{{ order.total_price }}</p>
             <p class="card-text">Status: <strong>{{ order.status|capfirst }}</strong></p>
             
             {% if order.is_refunded %}
@@ -23,7 +23,7 @@
     <div class="mt-5">
         <h3>Refund Information</h3>
         {% if order.is_refunded %}
-            <p>Refund Request Amount: ${{ order.refund_amount }}</p>
+            <p>Refund Request Amount: ৳{{ order.refund_amount }}</p>
             <p>Refund Request Reason: {{ order.refund_reason }}</p>
             <p>Refund Status: 
                 <strong>
