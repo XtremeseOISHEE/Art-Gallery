@@ -7,7 +7,7 @@
       {% for item in artworks_with_orders %}
         <div style="width: 300px; border: 1px solid #ddd; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); padding: 15px; text-align: center;">
           <h2 style="font-size: 20px; margin-bottom: 10px;">{{ item.artwork.title }}</h2>
-          <img src="{{ item.artwork.image.url }}" alt="{{ item.artwork.title }}" style="width: 100%; height: auto; border-radius: 8px; margin-bottom: 10px;">
+          <img src="{{ item.artwork.image.url }}" alt="{{ item.artwork.title }}" style="width: 100%; height: auto; border-radius: 8px; margin-bottom: 10px;" oncontextmenu="return false"  draggable="false">
           <p><strong>Orders:</strong> {{ item.orders.count }}</p>
 
           {% if item.orders %}

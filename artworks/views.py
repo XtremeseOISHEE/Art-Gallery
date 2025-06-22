@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Artwork
-from .forms import ArtworkForm
+from .forms import ArtworkForm, ArtworkImageFormSet
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseForbidden
 from django.contrib.auth.decorators import login_required, user_passes_test
@@ -10,28 +10,41 @@ from django.db.models import Q
 from django.contrib import messages
 
 
-from .models import Artwork, CATEGORY_CHOICES, ART_TYPE_CHOICES
+from .models import Artwork, ArtworkImage, CATEGORY_CHOICES, ART_TYPE_CHOICES
+from .forms import ArtworkForm  # your form remains same unless you customize
 
-def homepage(request):
+def home(request):
     return render(request, 'artworks/home.html')
 
 
 def is_staff(user):
     return user.is_staff
 
-# Create Artwork
+
 @login_required
 def artwork_create(request):
     if request.method == 'POST':
         form = ArtworkForm(request.POST, request.FILES)
-        if form.is_valid():
+        formset = ArtworkImageFormSet(request.POST, request.FILES)
+
+        if form.is_valid() and formset.is_valid():
             artwork = form.save(commit=False)
             artwork.artist = request.user
             artwork.save()
+            form.save_m2m()
+
+            for image_form in formset:
+                if image_form.cleaned_data:
+                    image = image_form.save(commit=False)
+                    image.artwork = artwork
+                    image.save()
+
             return redirect('artwork_detail', pk=artwork.pk)
     else:
         form = ArtworkForm()
-    return render(request, 'artworks/artwork_form.html', {'form': form})
+        formset = ArtworkImageFormSet()
+
+    return render(request, 'artworks/artwork_form.html', {'form': form, 'formset': formset})
 
 # Edit Artwork
 @login_required
@@ -98,7 +111,11 @@ def artwork_list(request):
         'art_type_choices': art_type_choices
     })
 
+# help faq
+from django.shortcuts import render
 
+def faq_view(request):
+    return render(request, 'faq.html')
 
 # Artwork Details
 # def artwork_detail(request, pk):
@@ -379,7 +396,7 @@ from django.shortcuts import render
 
 from django.shortcuts import render
 
-def homepage(request):
+def home(request):
     notifications_count = 0
     if request.user.is_authenticated:
         notifications_count = request.user.notifications.filter(unread=True).count()

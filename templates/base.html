@@ -24,17 +24,25 @@
   <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
       <div class="container">
-        <a class="navbar-brand" href="{% url 'homepage' %}">ArtNest</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-          aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <a class="navbar-brand" href="{% url 'home' %}">ArtNest</a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+          aria-controls="navbarNav"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
           <span class="navbar-toggler-icon"></span>
         </button>
 
         <div class="collapse navbar-collapse" id="navbarNav">
           <ul class="navbar-nav me-auto">
             <li class="nav-item">
-              <a class="nav-link" href="{% url 'homepage' %}">Home</a>
+              <a class="nav-link" href="{% url 'home' %}">Home</a>
             </li>
+
             <li class="nav-item">
               <a class="nav-link" href="{% url 'artwork_list' %}">Artworks</a>
             </li>
@@ -69,7 +77,11 @@
                   <a class="nav-link" href="{% url 'pending_artworks' %}">Pending Artworks</a>
                 </li>
               {% endif %}
-
+              <!--  -->
+              <li class="nav-item">
+                 <a class="nav-link" href="{% url 'faq' %}">Help</a>
+                </li>
+               <!--  -->
               <li class="nav-item">
                 <form method="POST" action="{% url 'logout' %}" class="d-flex align-items-center">
                   {% csrf_token %}

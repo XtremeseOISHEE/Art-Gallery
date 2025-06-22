@@ -6,28 +6,103 @@ artwork_detail.html
 {% block title %}{{ artwork.title }}{% endblock %}
 
 {% block content %}
-<div style="max-width: 800px; margin: auto; padding: 20px; font-family: Arial, sans-serif;">
+<div style="max-width: 900px; margin: auto; padding: 20px; font-family: Arial, sans-serif;">
   <h2 style="text-align: center; margin-bottom: 20px;">{{ artwork.title }}</h2>
 
-  <div style="text-align: center; margin-bottom: 20px; max-width: 400px; margin-left: auto; margin-right: auto;">
-    <img src="{{ artwork.image.url }}" alt="{{ artwork.title }}"
-         style="width: 100%; height: auto; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+  <!-- Image Preview with Zoom and Thumbnails -->
+  <div class="image-zoom-container" style="text-align: center; margin-bottom: 30px;">
+    <!-- Main Image -->
+    <div class="main-preview" style="border: 2px solid #ccc; display: inline-block; padding: 5px; border-radius: 10px;">
+      <img id="mainImage" src="{{ artwork.image.url }}" alt="Main Image"
+           style="width: 100%; max-width: 450px; height: auto; border-radius: 10px; transition: transform 0.3s ease;">
+    </div>
+
+    <!-- Thumbnail Row -->
+    <div class="thumbnail-row" style="margin-top: 15px; display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;">
+      <!-- Main Artwork Thumbnail -->
+      <img src="{{ artwork.image.url }}" alt="Thumbnail" class="thumb"
+           onclick="changeImage(this)"
+           style="width: 80px; height: 80px; object-fit: cover; border: 2px solid #999; border-radius: 6px; cursor: pointer;">
+
+      <!-- Extra ArtworkImage Thumbnails -->
+      {% for img in artwork.extra_images.all %}
+        <img src="{{ img.image.url }}" alt="Extra Image" class="thumb"
+             onclick="changeImage(this)"
+             style="width: 80px; height: 80px; object-fit: cover; border: 2px solid #999; border-radius: 6px; cursor: pointer;">
+      {% endfor %}
+    </div>
   </div>
 
+  <!-- Description & Meta -->
   <p><strong>Description:</strong> {{ artwork.description }}</p>
-  <p><strong>Price:</strong> ${{ artwork.price }}</p>
+  <p><strong>Price:</strong> ৳{{ artwork.price }}</p>
   <p><strong>Category:</strong> {{ artwork.category }}</p>
+  <p><strong>Art Type:</strong> {{ artwork.get_art_type_display }}</p>
   <p><strong>Artist:</strong> 
     <a href="{% url 'view_profile' artwork.artist.username %}">
       {{ artwork.artist.username }}
     </a>
   </p>
-  
- {% if request.user.is_authenticated and artwork.artist and request.user != artwork.artist %}
-  <a href="{% url 'conversation_detail' artwork.artist.username %}" class="btn btn-outline-primary mt-3">
-    💬 Message Seller
-  </a>
-{% endif %}
+
+  <!-- Order Form -->
+  <form method="post" style="margin-top: 25px; background: #222; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.6); color: #ddd;">
+    {% csrf_token %}
+    {% if artwork.art_type in "digital,illustration" %}
+      <div class="mb-3">
+        <label for="size">Select Size (pixels):</label>
+        <select name="size" id="size">
+          <option value="">--Choose a size--</option>
+          <option value="1080x1350">1080×1350 px</option>
+          <option value="1080x1080">1080×1080 px</option>
+          <option value="1920x1080">1920×1080 px</option>
+          <option value="3508x4961">3508×4961 px</option>
+        </select>
+      </div>
+    {% elif artwork.art_type in "3d,handmade_crafts" %}
+      <p><strong>Size:</strong> {{ artwork.custom_size }}</p>
+    {% else %}
+      <div class="mb-3">
+        <label for="size">Select Size (inches):</label>
+        <select name="size" id="size">
+          <option value="">--Choose a size--</option>
+          <option value="A4">A4 (8.3×11.7 in)</option>
+          <option value="A3">A3 (11.7×16.5 in)</option>
+          <option value="A2">A2 (16.5×23.4 in)</option>
+          <option value="A1">A1 (23.4×33.1 in)</option>
+          <option value="18x24">18×24 in</option>
+          <option value="24x36">24×36 in</option>
+        </select>
+      </div>
+    {% endif %}
+
+    {% if artwork.art_type in "poster,traditional,exclusive_paintings,print" %}
+      <div class="mb-3">
+        <label for="frame">Add a Frame:</label>
+        <select name="frame" id="frame">
+          <option value="none">No Frame</option>
+          <option value="wood">Wood Frame (+৳300)</option>
+          <option value="metal">Metal Frame (+৳350)</option>
+          <option value="acrylic">Acrylic Frame (+৳250)</option>
+        </select>
+      </div>
+    {% endif %}
+
+    <div class="mb-3">
+      <label for="amount">Quantity:</label>
+      <input type="number" id="amount" name="amount" value="1" min="1" required>
+    </div>
+
+    <div style="text-align: right;">
+      <button type="submit" style="background-color: #1e7e34; color: white; padding: 10px 20px; border: none; border-radius: 5px; font-size: 16px;">
+        🛒 Add to Cart
+      </button>
+    </div>
+  </form>
+
+  <!-- Seller Message Button -->
+  {% if request.user.is_authenticated and artwork.artist and request.user != artwork.artist %}
+    <a href="{% url 'conversation_detail' artwork.artist.username %}" class="btn btn-outline-primary mt-3">💬 Message Seller</a>
+  {% endif %}
 
   {% if user == artwork.artist %}
     <p>
@@ -39,18 +114,8 @@ artwork_detail.html
   {% if user.is_staff and not artwork.is_approved %}
     <form method="post" action="{% url 'artwork_approve' artwork.pk %}">
       {% csrf_token %}
-      <button type="submit" style="background-color: #4CAF50; color: white; padding: 10px 15px; border: none; border-radius: 5px;">Approve Artwork</button>
+      <button type="submit" class="btn btn-success">Approve Artwork</button>
     </form>
-  {% endif %}
-
-  {% if show_order_button and request.user != artwork.artist %}
-    <form method="post" action="{% url 'create_order' artwork.pk %}" style="margin-top: 15px;">
-      {% csrf_token %}
-      <button type="submit" class="btn btn-outline-primary mt-3">Order Now</button>
-    </form>
-    <a href="{% url 'add_to_cart' artwork.id %}">
-      <button type="submit" class="btn btn-outline-primary mt-3">Add to Cart</button>
-    </a>
   {% endif %}
 
   <hr style="margin: 30px 0;">
@@ -58,39 +123,31 @@ artwork_detail.html
   <h3>⭐ Average Rating: {{ artwork.average_rating|default:"No ratings yet" }}</h3>
   <p>Total Reviews: {{ reviews|length }}</p>
 
-  <h3>Reviews:</h3>
-
+  <!-- Reviews Section -->
   {% for review in reviews %}
-    <div style="border: 1px solid #ccc; padding: 10px 15px; margin-bottom: 20px; border-radius: 8px;">
+    <div style="border: 1px solid #ccc; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
       <p><strong>{{ review.user.username }}</strong>: {{ review.rating }}⭐</p>
-      <p><strong> ➡️ {{ review.comment }}</strong>
-      {% if review.is_verified_purchase %}
-        <span style="color: green;">✅ Verified Purchase</span>
-      {% endif %}
-
+      <p>{{ review.comment }} {% if review.is_verified_purchase %}<span style="color: green;">✅ Verified Purchase</span>{% endif %}</p>
       {% if user == review.user or user.is_staff %}
         <form method="post" action="{% url 'delete_review' review.id %}" style="display:inline;">
           {% csrf_token %}
-          <button type="submit" style="background: none; border: none; color: red; cursor: pointer;">Delete</button>
+          <button type="submit" style="background: none; border: none; color: red;">Delete</button>
         </form> |
         <a href="{% url 'edit_review' review.id %}">Edit</a> |
       {% endif %}
-      
-      <!-- Like / Dislike Links for review -->
       <a href="{% url 'like_review' review.id %}?like=1">Like</a> |
       <a href="{% url 'like_review' review.id %}?like=0">Dislike</a>
-      </p>
 
+      <!-- Review Comments -->
       <h4 style="margin-top: 10px;">Comments:</h4>
       {% for comment in review.comments.all %}
         <div style="margin-left: 15px; border-left: 2px solid #ccc; padding-left: 10px;">
-          <p>  ➡️ <strong>{{ comment.user.username }}</strong>: {{ comment.comment }}</p>
-
+          <p>➡️ <strong>{{ comment.user.username }}</strong>: {{ comment.comment }}</p>
           {% if comment.user == user or user.is_staff %}
             <a href="{% url 'edit_comment' comment.id %}">Edit</a> |
             <form method="post" action="{% url 'delete_comment' comment.id %}" style="display:inline;">
               {% csrf_token %}
-              <button type="submit" onclick="return confirm('Delete this comment?');" style="background: none; border: none; color: red; cursor: pointer;">Delete</button>
+              <button type="submit" style="background: none; border: none; color: red;">Delete</button>
             </form>
           {% endif %}
         </div>
@@ -105,111 +162,48 @@ artwork_detail.html
 
   <hr style="margin: 30px 0;">
 
+  <!-- Review Form -->
   {% if user.is_authenticated %}
-  <h3 style="margin-top: 40px; margin-bottom: 15px; font-weight: 600; color: #eee;">Leave a Review:</h3>
-
-  <form method="post" action="{% url 'create_review' artwork.pk %}" style="max-width: 600px; margin: auto; background: #222; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.7); color: #ddd;">
-    {% csrf_token %}
-    
-    {% for field in form %}
-      <div style="margin-bottom: 15px;">
-        <label for="{{ field.id_for_label }}" style="display: block; font-weight: 500; margin-bottom: 6px; color: #ccc;">
-          {{ field.label }}{% if field.field.required %} <span style="color: #f44336;">*</span>{% endif %}
-        </label>
-        {{ field }}
-        {% if field.help_text %}
-          <small style="color: #999;">{{ field.help_text }}</small>
-        {% endif %}
-        {% if field.errors %}
-          <div style="color: #ff6b6b; font-size: 0.9em;">{{ field.errors }}</div>
-        {% endif %}
+    <h3 style="margin-top: 40px; margin-bottom: 15px;">Leave a Review:</h3>
+    <form method="post" action="{% url 'create_review' artwork.pk %}" style="background: #222; padding: 20px; border-radius: 8px; color: #ddd;">
+      {% csrf_token %}
+      {% for field in form %}
+        <div style="margin-bottom: 15px;">
+          <label for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %}<span style="color: #f44336;">*</span>{% endif %}</label>
+          {{ field }}
+          {% if field.help_text %}
+            <small style="color: #999;">{{ field.help_text }}</small>
+          {% endif %}
+          {% if field.errors %}
+            <div style="color: #ff6b6b;">{{ field.errors }}</div>
+          {% endif %}
+        </div>
+      {% endfor %}
+      <div style="text-align: right;">
+        <button type="submit" class="btn btn-success">Submit Review</button>
       </div>
-    {% endfor %}
-    
-    <div style="text-align: right;">
-      <button type="submit" style="
-        background-color: #1e7e34;
-        color: #f0f0f0;
-        padding: 10px 20px;
-        border: none;
-        border-radius: 6px;
-        font-size: 17px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: background-color 0.3s ease;
-      "
-      onmouseover="this.style.backgroundColor='#14532d'"
-      onmouseout="this.style.backgroundColor='#1e7e34'">
-        Submit Review
-      </button>
-    </div>
-  </form>
-{% else %}
-  <p style="text-align: center; margin-top: 30px; font-size: 1.1em; color: #ccc;">
-    <a href="{% url 'login' %}" style="color: #4dabf7; text-decoration: none;">Login</a> to post a review.
-  </p>
-{% endif %}
-
-<style>
-  textarea, input[type="text"], input[type="number"], select {
-    width: 100%;
-    max-width: 100%;
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-sizing: border-box;
-    display: block;
-    margin-top: 5px;
-  }
-  
- textarea, input, select {
-  width: 100%;
-  padding: 10px;
-  border: 1.5px solid #555;
-  border-radius: 5px;
-  font-size: 16px;
-  box-sizing: border-box;
-  background-color: #333;
-  color: #eee;
-  transition: border-color 0.3s ease;
-}
-textarea:focus, input:focus, select:focus {
-  border-color: #1e7e34;
-  outline: none;
-  background-color: #2a2a2a;
-}
-
-
-  form p {
-    margin-bottom: 15px;
-  }
-
-  .review-form {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    height: 280px; /* Adjust height as needed */
-  }
-
-  .review-form .fields {
-    flex: 1;
-  }
-
-  .review-form .submit-btn {
-    text-align: right;
-  }
-
-  .review-form button {
-    background-color: #28a745;
-    color: white;
-    padding: 8px 16px;
-    border: none;
-    border-radius: 5px;
-    font-size: 16px;
-    cursor: pointer;
-  }
-</style>
-
+    </form>
+  {% else %}
+    <p style="text-align: center; margin-top: 30px;">
+      <a href="{% url 'login' %}">Login</a> to post a review.
+    </p>
+  {% endif %}
 </div>
+
+<!-- Image Zoom Script -->
+<script>
+  function changeImage(thumb) {
+    const mainImage = document.getElementById('mainImage');
+    mainImage.src = thumb.src;
+  }
+
+  const mainImg = document.getElementById('mainImage');
+  mainImg.addEventListener('mouseover', () => {
+    mainImg.style.transform = 'scale(1.05)';
+  });
+  mainImg.addEventListener('mouseout', () => {
+    mainImg.style.transform = 'scale(1)';
+  });
+</script>
 {% endblock %}
 

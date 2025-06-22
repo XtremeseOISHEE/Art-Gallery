@@ -38,7 +38,7 @@ def login_view(request):
             user = authenticate(request, username=username, password=password)
             if user is not None:
                 login(request, user)
-                return redirect('homepage')  # Redirect to homepage after login
+                return redirect('home')  # Redirect to homepage after login
             else:
                 form.add_error(None, 'Invalid username or password')
     else:
@@ -51,7 +51,7 @@ from django.shortcuts import redirect
 # Logout View
 def logout_view(request):
     logout(request)  # Logs out the user
-    return redirect('homepage')  # Redirect to the homepage or any other page
+    return redirect('home')  # Redirect to the homepage or any other page
 
 
 
