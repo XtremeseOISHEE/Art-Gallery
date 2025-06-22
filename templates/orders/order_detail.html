@@ -7,7 +7,7 @@
     <h1 class="mb-4 text-center">Order #{{ order.id }} Details</h1>
 
     <div class="card bg-dark text-white mx-auto" style="max-width: 22rem;">
-        <img src="{{ order.artwork.image.url }}" class="card-img-top" alt="{{ order.artwork.title }}">
+        <img src="{{ order.artwork.image.url }}" class="card-img-top" alt="{{ order.artwork.title }}"  oncontextmenu="return false" draggable="false">
         <div class="card-body">
             <h5 class="card-title">{{ order.artwork.title }}</h5>
             <p class="card-text">Quantity: {{ order.quantity }}</p>

@@ -1,4 +1,4 @@
-artwork_detail.html
+
 
 {% extends 'base.html' %}
 {% load custom_filters %}
@@ -14,7 +14,7 @@ artwork_detail.html
     <!-- Main Image -->
     <div class="main-preview" style="border: 2px solid #ccc; display: inline-block; padding: 5px; border-radius: 10px;">
       <img id="mainImage" src="{{ artwork.image.url }}" alt="Main Image"
-           style="width: 100%; max-width: 450px; height: auto; border-radius: 10px; transition: transform 0.3s ease;">
+           style="width: 100%; max-width: 450px; height: auto; border-radius: 10px; transition: transform 0.3s ease;"  oncontextmenu="return false" draggable="false">
     </div>
 
     <!-- Thumbnail Row -->
@@ -22,13 +22,13 @@ artwork_detail.html
       <!-- Main Artwork Thumbnail -->
       <img src="{{ artwork.image.url }}" alt="Thumbnail" class="thumb"
            onclick="changeImage(this)"
-           style="width: 80px; height: 80px; object-fit: cover; border: 2px solid #999; border-radius: 6px; cursor: pointer;">
+           style="width: 80px; height: 80px; object-fit: cover; border: 2px solid #999; border-radius: 6px; cursor: pointer;"  oncontextmenu="return false" draggable="false">
 
       <!-- Extra ArtworkImage Thumbnails -->
       {% for img in artwork.extra_images.all %}
         <img src="{{ img.image.url }}" alt="Extra Image" class="thumb"
              onclick="changeImage(this)"
-             style="width: 80px; height: 80px; object-fit: cover; border: 2px solid #999; border-radius: 6px; cursor: pointer;">
+             style="width: 80px; height: 80px; object-fit: cover; border: 2px solid #999; border-radius: 6px; cursor: pointer;"  oncontextmenu="return false" draggable="false">
       {% endfor %}
     </div>
   </div>
