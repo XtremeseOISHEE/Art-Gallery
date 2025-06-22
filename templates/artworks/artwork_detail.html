@@ -1,4 +1,4 @@
- {% extends 'base.html' %}
+{% extends 'base.html' %}
 {% load custom_filters %}
 
 {% block title %}{{ artwork.title }}{% endblock %}
@@ -7,22 +7,31 @@
 <div style="max-width: 900px; margin: auto; padding: 20px; font-family: Arial, sans-serif;">
   <h2 style="text-align: center; margin-bottom: 20px;">{{ artwork.title }}</h2>
 
-  <!-- Main Image -->
-<div style="text-align: center; margin-bottom: 20px;">
-  <img src="{{ artwork.image.url }}" alt="{{ artwork.title }}"
-       style="width: 100%; max-width: 400px; height: auto; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
-</div>
+  <!-- Image Preview with Zoom and Thumbnails -->
+  <div class="image-zoom-container" style="text-align: center; margin-bottom: 30px;">
+    <!-- Main Image -->
+    <div class="main-preview" style="border: 2px solid #ccc; display: inline-block; padding: 5px; border-radius: 10px;">
+      <img id="mainImage" src="{{ artwork.image.url }}" alt="Main Image"
+           style="width: 100%; max-width: 450px; height: auto; border-radius: 10px; transition: transform 0.3s ease;">
+    </div>
 
-<!-- Extra Images Gallery -->
-{% if artwork.extra_images.all %}
-  <div style="display: flex; flex-wrap: wrap; gap: 15px; justify-content: center; margin-bottom: 30px;">
-    {% for img in artwork.extra_images.all %}
-      <img src="{{ img.image.url }}" alt="Additional Image"
-           style="width: 120px; height: auto; border-radius: 6px; box-shadow: 0 2px 6px rgba(0,0,0,0.15); object-fit: cover;">
-    {% endfor %}
+    <!-- Thumbnail Row -->
+    <div class="thumbnail-row" style="margin-top: 15px; display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;">
+      <!-- Main Artwork Thumbnail -->
+      <img src="{{ artwork.image.url }}" alt="Thumbnail" class="thumb"
+           onclick="changeImage(this)"
+           style="width: 80px; height: 80px; object-fit: cover; border: 2px solid #999; border-radius: 6px; cursor: pointer;">
+
+      <!-- Extra ArtworkImage Thumbnails -->
+      {% for img in artwork.extra_images.all %}
+        <img src="{{ img.image.url }}" alt="Extra Image" class="thumb"
+             onclick="changeImage(this)"
+             style="width: 80px; height: 80px; object-fit: cover; border: 2px solid #999; border-radius: 6px; cursor: pointer;">
+      {% endfor %}
+    </div>
   </div>
-{% endif %}
 
+  <!-- Description & Meta -->
   <p><strong>Description:</strong> {{ artwork.description }}</p>
   <p><strong>Price:</strong> ৳{{ artwork.price }}</p>
   <p><strong>Category:</strong> {{ artwork.category }}</p>
@@ -33,10 +42,9 @@
     </a>
   </p>
 
-  <!-- Purchase Form -->
+  <!-- Order Form -->
   <form method="post" style="margin-top: 25px; background: #222; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.6); color: #ddd;">
     {% csrf_token %}
-
     {% if artwork.art_type in "digital,illustration" %}
       <div class="mb-3">
         <label for="size">Select Size (pixels):</label>
@@ -49,7 +57,7 @@
         </select>
       </div>
     {% elif artwork.art_type in "3d,handmade_crafts" %}
-      <p style="margin-bottom: 10px;"><strong>Size:</strong> {{ artwork.custom_size }}</p>
+      <p><strong>Size:</strong> {{ artwork.custom_size }}</p>
     {% else %}
       <div class="mb-3">
         <label for="size">Select Size (inches):</label>
@@ -89,6 +97,7 @@
     </div>
   </form>
 
+  <!-- Seller Message Button -->
   {% if request.user.is_authenticated and artwork.artist and request.user != artwork.artist %}
     <a href="{% url 'conversation_detail' artwork.artist.username %}" class="btn btn-outline-primary mt-3">💬 Message Seller</a>
   {% endif %}
@@ -112,7 +121,7 @@
   <h3>⭐ Average Rating: {{ artwork.average_rating|default:"No ratings yet" }}</h3>
   <p>Total Reviews: {{ reviews|length }}</p>
 
-  <h3>Reviews:</h3>
+  <!-- Reviews Section -->
   {% for review in reviews %}
     <div style="border: 1px solid #ccc; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
       <p><strong>{{ review.user.username }}</strong>: {{ review.rating }}⭐</p>
@@ -127,6 +136,7 @@
       <a href="{% url 'like_review' review.id %}?like=1">Like</a> |
       <a href="{% url 'like_review' review.id %}?like=0">Dislike</a>
 
+      <!-- Review Comments -->
       <h4 style="margin-top: 10px;">Comments:</h4>
       {% for comment in review.comments.all %}
         <div style="margin-left: 15px; border-left: 2px solid #ccc; padding-left: 10px;">
@@ -150,6 +160,7 @@
 
   <hr style="margin: 30px 0;">
 
+  <!-- Review Form -->
   {% if user.is_authenticated %}
     <h3 style="margin-top: 40px; margin-bottom: 15px;">Leave a Review:</h3>
     <form method="post" action="{% url 'create_review' artwork.pk %}" style="background: #222; padding: 20px; border-radius: 8px; color: #ddd;">
@@ -176,4 +187,20 @@
     </p>
   {% endif %}
 </div>
+
+<!-- Image Zoom Script -->
+<script>
+  function changeImage(thumb) {
+    const mainImage = document.getElementById('mainImage');
+    mainImage.src = thumb.src;
+  }
+
+  const mainImg = document.getElementById('mainImage');
+  mainImg.addEventListener('mouseover', () => {
+    mainImg.style.transform = 'scale(1.05)';
+  });
+  mainImg.addEventListener('mouseout', () => {
+    mainImg.style.transform = 'scale(1)';
+  });
+</script>
 {% endblock %}

@@ -86,7 +86,6 @@ class Artwork(models.Model):
     artist = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     price = models.DecimalField(max_digits=10, decimal_places=2)
     image = models.ImageField(upload_to='artwork/')
-    category = models.CharField(max_length=50, choices=CATEGORY_CHOICES)
     art_type = models.CharField(max_length=20, choices=ART_TYPE_CHOICES, default='traditional')
     created_at = models.DateTimeField(auto_now_add=True)
     is_available = models.BooleanField(default=True)
