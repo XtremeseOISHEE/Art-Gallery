@@ -74,42 +74,87 @@ def artwork_delete(request, pk):
         return redirect('artwork_list')
     return render(request, 'artworks/artwork_confirm_delete.html', {'artwork': artwork})
 
-# List Artworks
+from .models import Artwork, Category, CATEGORY_CHOICES, ART_TYPE_CHOICES
+
 
 def artwork_list(request):
-    query = request.GET.get('q')  # Search box theke query nicchi
+    query = request.GET.get('q', '')
     category = request.GET.get('category', '')
     art_type = request.GET.get('art_type', '')
 
     filters = Q(is_available=True, is_approved=True)
 
+    # Convert category to int if possible, else None
+    try:
+        category_id = int(category)
+    except (ValueError, TypeError):
+        category_id = None
+
     if query:
         filters &= (
             Q(title__icontains=query) |
             Q(description__icontains=query) |
-            Q(category__icontains=query) |
+            Q(category__name__icontains=query) |  # optional full text search by category name
             Q(art_type__icontains=query)
         )
 
-    if category:
-        filters &= Q(category=category)
+    if category_id:
+        filters &= Q(category__id=category_id)
 
     if art_type:
         filters &= Q(art_type=art_type)
 
-    artworks = Artwork.objects.filter(filters)
-
-    category_choices = CATEGORY_CHOICES  # Make sure you have these choices in your model or somewhere
-    art_type_choices = ART_TYPE_CHOICES  # Make sure you have these choices in your model or somewhere
+    artworks = Artwork.objects.filter(filters).distinct()
+    categories = Category.objects.all()
 
     return render(request, 'artworks/artwork_list.html', {
         'artworks': artworks,
         'query': query,
         'category': category,
         'art_type': art_type,
-        'category_choices': category_choices,
-        'art_type_choices': art_type_choices
+        'categories': categories,          # real categories queryset
+        'art_type_choices': ART_TYPE_CHOICES,
     })
+
+
+def artwork_search(request):
+    query = request.GET.get('q', '')
+    category = request.GET.get('category', '')
+    art_type = request.GET.get('art_type', '')
+
+    filters = Q()
+
+    try:
+        category_id = int(category)
+    except (ValueError, TypeError):
+        category_id = None
+
+    if query:
+        filters &= (
+            Q(title__icontains=query) |
+            Q(description__icontains=query) |
+            Q(category__name__icontains=query) |
+            Q(art_type__icontains=query)
+        )
+
+    if category_id:
+        filters &= Q(category__id=category_id)
+
+    if art_type:
+        filters &= Q(art_type=art_type)
+
+    artworks = Artwork.objects.filter(filters).distinct()
+    categories = Category.objects.all()
+
+    return render(request, 'artworks/artwork_list.html', {
+        'artworks': artworks,
+        'query': query,
+        'category': category,
+        'art_type': art_type,
+        'categories': categories,
+        'art_type_choices': ART_TYPE_CHOICES,
+    })
+
 
 # help faq
 from django.shortcuts import render
@@ -335,40 +380,37 @@ def artwork_approve(request, pk):
 
     return redirect('artwork_detail', pk=artwork.pk)
 
-def artwork_search(request):
-    query = request.GET.get('q')
-    category = request.GET.get('category', '')
-    art_type = request.GET.get('art_type', '')
+# def artwork_search(request):
+#     query = request.GET.get('q', '')
+#     category = request.GET.get('category', '')
+#     art_type = request.GET.get('art_type', '')
 
-    filters = Q()
+#     filters = Q()
 
-    if query:
-        filters &= (
-            Q(title__icontains=query) |
-            Q(description__icontains=query) |
-            Q(category__icontains=query) |
-            Q(art_type__icontains=query)
-        )
+#     if query:
+#         filters &= (
+#             Q(title__icontains=query) |
+#             Q(description__icontains=query) |
+#             Q(categories__name__icontains=query) |  # ✅ FIXED
+#             Q(art_type__icontains=query)
+#         )
 
-    if category:
-        filters &= Q(category=category)
+#     if category:
+#         filters &= Q(categories__name=category)  # ✅ FIXED
 
-    if art_type:
-        filters &= Q(art_type=art_type)
+#     if art_type:
+#         filters &= Q(art_type=art_type)
 
-    artworks = Artwork.objects.filter(filters)
+#     artworks = Artwork.objects.filter(filters).distinct()  # ✅ Use distinct() with M2M
 
-    category_choices = CATEGORY_CHOICES  # Pass category choices to the template
-    art_type_choices = ART_TYPE_CHOICES  # Pass art type choices to the template
-
-    return render(request, 'artworks/artwork_list.html', {
-        'artworks': artworks,
-        'query': query,
-        'category': category,
-        'art_type': art_type,
-        'category_choices': category_choices,
-        'art_type_choices': art_type_choices
-    })
+#     return render(request, 'artworks/artwork_list.html', {
+#         'artworks': artworks,
+#         'query': query,
+#         'category': category,
+#         'art_type': art_type,
+#         'category_choices': CATEGORY_CHOICES,
+#         'art_type_choices': ART_TYPE_CHOICES,
+#     })
 # artworks/views.py
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
