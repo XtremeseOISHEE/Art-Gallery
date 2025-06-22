@@ -1,4 +1,4 @@
-artwork_detail.html
+
 
 {% extends 'base.html' %}
 {% load custom_filters %}
@@ -50,7 +50,7 @@ artwork_detail.html
     {% if artwork.art_type in "digital,illustration" %}
       <div class="mb-3">
         <label for="size">Select Size (pixels):</label>
-        <select name="size" id="size">
+         <select name="size" id="size" required>
           <option value="">--Choose a size--</option>
           <option value="1080x1350">1080×1350 px</option>
           <option value="1080x1080">1080×1080 px</option>
@@ -63,7 +63,7 @@ artwork_detail.html
     {% else %}
       <div class="mb-3">
         <label for="size">Select Size (inches):</label>
-        <select name="size" id="size">
+         <select name="size" id="size" required>
           <option value="">--Choose a size--</option>
           <option value="A4">A4 (8.3×11.7 in)</option>
           <option value="A3">A3 (11.7×16.5 in)</option>
@@ -78,7 +78,7 @@ artwork_detail.html
     {% if artwork.art_type in "poster,traditional,exclusive_paintings,print" %}
       <div class="mb-3">
         <label for="frame">Add a Frame:</label>
-        <select name="frame" id="frame">
+        <select name="frame" id="frame" required>
           <option value="none">No Frame</option>
           <option value="wood">Wood Frame (+৳300)</option>
           <option value="metal">Metal Frame (+৳350)</option>
@@ -92,16 +92,26 @@ artwork_detail.html
       <input type="number" id="amount" name="amount" value="1" min="1" required>
     </div>
 
+                               
     <div style="text-align: right;">
-      <button type="submit" style="background-color: #1e7e34; color: white; padding: 10px 20px; border: none; border-radius: 5px; font-size: 16px;">
+      
+      <a href="{% url 'add_to_cart' artwork.id %}" class="btn btn-outline-primary mt-3">
+      
         🛒 Add to Cart
-      </button>
+      
+      </a>
+           
     </div>
   </form>
 
   <!-- Seller Message Button -->
   {% if request.user.is_authenticated and artwork.artist and request.user != artwork.artist %}
+
+     <a href="{% url 'create_order' artwork.id %}" class="btn btn-outline-primary mt-3">Order Now
+                               
+     </a>
     <a href="{% url 'conversation_detail' artwork.artist.username %}" class="btn btn-outline-primary mt-3">💬 Message Seller</a>
+    
   {% endif %}
 
   {% if user == artwork.artist %}
