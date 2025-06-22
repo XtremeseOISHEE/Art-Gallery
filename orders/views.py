@@ -22,11 +22,51 @@ from .forms import OrderForm
 from artworks.models import Artwork
 
 
+# @login_required
+# def create_order(request, artwork_id):
+#     artwork = get_object_or_404(Artwork, id=artwork_id)
+
+#     if request.user.role not in ['buyer', 'seller']:
+#         messages.error(request, "You are not authorized to place an order.")
+#         return redirect('artwork_detail', pk=artwork_id)
+
+#     if request.method == 'POST':
+#         form = OrderForm(request.POST, artwork=artwork)
+#         if form.is_valid():
+#             order = form.save(commit=False)
+#             order.user = request.user
+#             order.artwork = artwork
+#             order.size = form.cleaned_data.get('size')
+#             order.frame = form.cleaned_data.get('frame') or 'none'
+#             order.quantity = form.cleaned_data['quantity']
+
+#             frame_price_map = {
+#                 'wood': 300,
+#                 'metal': 350,
+#                 'acrylic': 250,
+#                 'none': 0,
+#             }
+#             frame_extra = frame_price_map.get(order.frame, 0)
+#             order.total_price = (artwork.price + frame_extra) * order.quantity
+#             order.save()
+
+#             # If "Place Order" button is clicked, go directly to confirm
+#             if 'place_order' in request.POST:
+#                 return redirect('order_confirm', order_id=order.id)
+#             else:
+#                 return redirect('view_cart')
+#         else:
+#             messages.error(request, "There was an error in your order form. Please try again.")
+#     else:
+#         form = OrderForm(artwork=artwork)
+
+#     return render(request, 'orders/create_order.html', {'form': form, 'artwork': artwork})
+
 @login_required
 def create_order(request, artwork_id):
     artwork = get_object_or_404(Artwork, id=artwork_id)
 
-    if request.user.role not in ['buyer', 'seller']:
+    if not hasattr(request.user, 'role') or request.user.role not in ['buyer', 'seller']:
         messages.error(request, "You are not authorized to place an order.")
         return redirect('artwork_detail', pk=artwork_id)
 
@@ -36,7 +76,7 @@ def create_order(request, artwork_id):
             order = form.save(commit=False)
             order.user = request.user
             order.artwork = artwork
-            order.size = form.cleaned_data.get('size')
+            order.size = form.cleaned_data.get('size') or ''
             order.frame = form.cleaned_data.get('frame') or 'none'
             order.quantity = form.cleaned_data['quantity']
 
@@ -50,7 +90,6 @@ def create_order(request, artwork_id):
             order.total_price = (artwork.price + frame_extra) * order.quantity
             order.save()
 
-            # If "Place Order" button is clicked, go directly to confirm
             if 'place_order' in request.POST:
                 return redirect('order_confirm', order_id=order.id)
             else:
@@ -61,7 +100,6 @@ def create_order(request, artwork_id):
         form = OrderForm(artwork=artwork)
 
     return render(request, 'orders/create_order.html', {'form': form, 'artwork': artwork})
-
 
 
 # View Order detail
@@ -254,6 +292,54 @@ def reject_refund(request, pk):
         messages.success(request, 'Refund rejected.')
     return redirect('order_detail', pk=pk)
 
+# @login_required
+# def cart_order_confirm(request):
+#     selected_item_ids = request.session.get('selected_item_ids')
+#     total_price = request.session.get('total_price')
+
+#     if not selected_item_ids or not total_price:
+#         messages.error(request, "Something went wrong. Please try again.")
+#         return redirect('view_cart')
+
+#     cart = get_object_or_404(Cart, user=request.user)
+#     items = cart.items.filter(id__in=selected_item_ids)
+
+#     if request.method == "POST":
+#         name = request.POST.get("name")
+#         phone = request.POST.get("phone")
+#         address = request.POST.get("address")
+
+#         if not all([name, phone, address]):
+#             messages.error(request, "Please fill in all delivery details.")
+#             return render(request, 'orders/cart_order_confirm.html', {'items': items, 'total_price': total_price})
+
+#         # ✅ Create orders here (moved from finalize_payment)
+#         for item in items:
+#             Order.objects.create(
+#                 user=request.user,
+#                 artwork=item.artwork,
+#                 quantity=item.quantity,
+#                 total_price=item.get_total_price(),
+#                 delivery_name=name,
+#                 delivery_phone=phone,
+#                 delivery_address=address,
+#             )
+#             item.delete()  # Remove item from cart
+
+#         # Clear session
+#         request.session.pop('selected_item_ids', None)
+#         request.session.pop('delivery_name', None)
+#         request.session.pop('delivery_phone', None)
+#         request.session.pop('delivery_address', None)
+#         request.session.pop('total_price', None)
+
+#         messages.success(request, "Your order was placed successfully!")
+#         return redirect('order_list')  # or redirect to order success page
+
+#     return render(request, 'orders/cart_order_confirm.html', {'items': items, 'total_price': total_price})
+from payments.models import Transaction
+import uuid  # to generate dummy transaction_id (for now)
+
 @login_required
 def cart_order_confirm(request):
     selected_item_ids = request.session.get('selected_item_ids')
@@ -270,14 +356,18 @@ def cart_order_confirm(request):
         name = request.POST.get("name")
         phone = request.POST.get("phone")
         address = request.POST.get("address")
+        method = request.POST.get("method")  # ✅ selected radio button value
 
-        if not all([name, phone, address]):
-            messages.error(request, "Please fill in all delivery details.")
-            return render(request, 'orders/cart_order_confirm.html', {'items': items, 'total_price': total_price})
+        if not all([name, phone, address, method]):
+            messages.error(request, "Please fill in all required fields.")
+            return render(request, 'orders/cart_order_confirm.html', {
+                'items': items,
+                'total_price': total_price
+            })
 
-        # ✅ Create orders here (moved from finalize_payment)
         for item in items:
-            Order.objects.create(
+            # ✅ Create order
+            order = Order.objects.create(
                 user=request.user,
                 artwork=item.artwork,
                 quantity=item.quantity,
@@ -286,16 +376,26 @@ def cart_order_confirm(request):
                 delivery_phone=phone,
                 delivery_address=address,
             )
-            item.delete()  # Remove item from cart
 
-        # Clear session
+            # ✅ Create related transaction
+            Transaction.objects.create(
+                order=order,
+                method=method,
+                amount=item.get_total_price(),
+                status='pending',  # or 'success' if you treat as auto success
+                transaction_id=str(uuid.uuid4())  # temporary random ID
+            )
+
+            item.delete()  # remove from cart
+
+        # ✅ Clear session
         request.session.pop('selected_item_ids', None)
-        request.session.pop('delivery_name', None)
-        request.session.pop('delivery_phone', None)
-        request.session.pop('delivery_address', None)
         request.session.pop('total_price', None)
 
         messages.success(request, "Your order was placed successfully!")
-        return redirect('order_list')  # or redirect to order success page
+        return redirect('order_list')
 
-    return render(request, 'orders/cart_order_confirm.html', {'items': items, 'total_price': total_price})
+    return render(request, 'orders/cart_order_confirm.html', {
+        'items': items,
+        'total_price': total_price
+    })

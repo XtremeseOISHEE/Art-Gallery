@@ -1,23 +1,80 @@
 {% extends 'base.html' %}
+
 {% block content %}
-  <h2>Delivery Details</h2>
-  <form method="POST">
-    {% csrf_token %}
-    <label for="name">Name:</label>
-    <input type="text" name="name" required><br>
-    <label for="phone">Phone:</label>
-    <input type="text" name="phone" required><br>
-    <label for="address">Address:</label>
-    <textarea name="address" required></textarea><br>
+<div class="container mt-5" style="max-width: 750px;">
+  <div class="card bg-dark text-light shadow-lg">
+    <div class="card-body">
 
-    <h3>Order Summary</h3>
-    <ul>
-      {% for item in items %}
-        <li>{{ item.artwork.title }} — Qty: {{ item.quantity }} — {{ item.get_total_price }}৳</li>
-      {% endfor %}
-    </ul>
-    <p><strong>Total:</strong> {{ total_price }}৳</p>
+      <!-- Title -->
+      <h2 class="card-title text-center mb-4">🚚 Delivery Details</h2>
 
-    <button type="submit">Proceed to Pay</button>
-  </form>
+      <form method="POST">
+        {% csrf_token %}
+
+        <!-- Name -->
+        <div class="mb-3">
+          <label for="name" class="form-label">Name:</label>
+          <input type="text" name="name" class="form-control bg-secondary text-light border-0" required>
+        </div>
+
+        <!-- Phone -->
+        <div class="mb-3">
+          <label for="phone" class="form-label">Phone:</label>
+          <input type="text" name="phone" class="form-control bg-secondary text-light border-0" required>
+        </div>
+
+        <!-- Address -->
+        <div class="mb-5">
+          <label for="address" class="form-label">Address:</label>
+            <textarea name="address" class="form-control bg-secondary text-light border-0" rows="3" required></textarea>
+            
+        </div>
+        <!-- Order Summary Heading -->
+         
+        <div class="mb-4">
+  <h4 class="text-center">🧾 Order Summary</h4>
+  <ul class="list-group">
+    {% for item in items %}
+      <li class="list-group-item bg-dark text-light d-flex justify-content-between">
+        {{ item.artwork.title }} — Qty: {{ item.quantity }}
+        <span>{{ item.get_total_price }}৳</span>
+      </li>
+    {% endfor %}
+    <li class="list-group-item bg-secondary text-light fw-bold d-flex justify-content-between">
+      Total:
+      <span>{{ total_price }}৳</span>
+    </li>
+  </ul>
+</div>
+      <div>
+        <!-- Payment Method Heading -->
+        <h4 class="text-center mt-5 mb-3">💳 Select Payment Method</h4>
+
+        <!-- Payment Options -->
+        <div class="text-center">
+          <div class="form-check my-2">
+            <input class="form-check-input" type="radio" name="method" value="bkash" id="bkash" required>
+            <label class="form-check-label ms-2" for="bkash">bKash</label>
+          </div>
+          <div class="form-check my-2">
+            <input class="form-check-input" type="radio" name="method" value="paypal" id="paypal">
+            <label class="form-check-label ms-2" for="paypal">PayPal</label>
+          </div>
+          <div class="form-check my-2">
+            <input class="form-check-input" type="radio" name="method" value="card" id="card">
+            <label class="form-check-label ms-2" for="card">Card</label>
+          </div>
+          <div class="form-check my-2 mb-4">
+            <input class="form-check-input" type="radio" name="method" value="cod" id="cod">
+            <label class="form-check-label ms-2" for="cod">Cash on Delivery</label>
+          </div>
+        </div>
+
+        <!-- Submit -->
+        <button type="submit" class="btn btn-success w-100">✅ Proceed to Pay</button>
+      </form>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}

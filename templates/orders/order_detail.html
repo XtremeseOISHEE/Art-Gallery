@@ -3,11 +3,11 @@
 {% block title %}Order Detail{% endblock %}
 
 {% block content %}
-<div class="container mt-5 text-white">
+<div class="container mt-5 text-white" style="max-width: 24rem;">
     <h1 class="mb-4 text-center">Order #{{ order.id }} Details</h1>
 
-    <div class="card bg-dark text-white mx-auto" style="max-width: 22rem;">
-        <img src="{{ order.artwork.image.url }}" class="card-img-top" alt="{{ order.artwork.title }}"  oncontextmenu="return false" draggable="false">
+    <div class="card bg-dark text-white mx-auto shadow-sm rounded-4">
+        <img src="{{ order.artwork.image.url }}" class="card-img-top rounded-top" alt="{{ order.artwork.title }}" oncontextmenu="return false" draggable="false">
         <div class="card-body">
             <h5 class="card-title">{{ order.artwork.title }}</h5>
             <p class="card-text">Quantity: {{ order.quantity }}</p>
@@ -20,22 +20,22 @@
         </div>
     </div>
 
-    <div class="mt-5">
+    <div class="card bg-dark text-light p-4 shadow rounded-4 mt-4">
         <h3>Refund Information</h3>
         {% if order.is_refunded %}
-            <p>Refund Request Amount: ৳{{ order.refund_amount }}</p>
-            <p>Refund Request Reason: {{ order.refund_reason }}</p>
-            <p>Refund Status: 
-                <strong>
-                {% if order.refund_status == 'approved' %}
-                    ✅ Approved
-                {% elif order.refund_status == 'rejected' %}
-                    ❌ Rejected
-                {% else %}
-                    ⏳ Pending
-                {% endif %}
-                </strong>
-            </p>
+            <div class="card bg-secondary text-white p-3 rounded-4 shadow-sm">
+                <p class="mb-2"><strong>Refund Request Amount:</strong> ৳{{ order.refund_amount }}</p>
+                <p class="mb-2"><strong>Refund Request Reason:</strong> {{ order.refund_reason }}</p>
+                <p class="mb-0"><strong>Refund Status:</strong> 
+                    {% if order.refund_status == 'approved' %}
+                        <span class="text-success">✅ Approved</span>
+                    {% elif order.refund_status == 'rejected' %}
+                        <span class="text-danger">❌ Rejected</span>
+                    {% else %}
+                        <span class="text-warning">⏳ Pending</span>
+                    {% endif %}
+                </p>
+            </div>
         {% else %}
             <p>No refund requested.</p>
 
@@ -44,21 +44,23 @@
                 {% csrf_token %}
                 <div class="mb-3">
                     <label for="refund_amount" class="form-label">Refund Amount:</label>
-                    <input type="number" step="0.01" class="form-control bg-dark text-white border-secondary" id="refund_amount" name="refund_amount" required>
+                    <input type="number" step="0.01" class="form-control bg-dark text-white border-secondary rounded" id="refund_amount" name="refund_amount" required>
                 </div>
                 <div class="mb-3">
                     <label for="refund_reason" class="form-label">Refund Reason:</label>
-                    <textarea class="form-control bg-dark text-white border-secondary" id="refund_reason" name="refund_reason" rows="4" required></textarea>
+                    <textarea class="form-control bg-dark text-white border-secondary rounded" id="refund_reason" name="refund_reason" rows="4" required></textarea>
                 </div>
-                <button type="submit" class="btn btn-warning">Submit Refund Request</button>
+                <button type="submit" class="btn btn-warning w-100" style="font-weight: 600;">
+                    Submit Refund Request
+                </button>
             </form>
         {% endif %}
     </div>
 
-    <div class="mt-4">
-        <a href="{% url 'order_list' %}" class="btn btn-secondary">Back to Orders</a>
+    <div class="mt-4 d-flex justify-content-between flex-wrap gap-2">
+        <a href="{% url 'order_list' %}" class="btn btn-secondary flex-grow-1 flex-md-grow-0">Back to Orders</a>
         {% if user.is_staff %}
-            <a href="{% url 'update_order_status' order.id %}" class="btn btn-warning mt-2">Update Order Status</a>
+            <a href="{% url 'update_order_status' order.id %}" class="btn btn-warning flex-grow-1 flex-md-grow-0">Update Order Status</a>
         {% endif %}
     </div>
 </div>

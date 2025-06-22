@@ -9,63 +9,49 @@
     <p>{{ artwork.description }}</p>
     <p><strong>Price:</strong> ৳{{ artwork.price }}</p>
 
-    {% if messages %}
-        
-    {% endif %}
+    <!-- {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    {% endif %} -->
 
     <form method="POST">
         {% csrf_token %}
 
-        <!-- Select Size -->
-    {% if artwork.art_type == "digital" or artwork.art_type == "illustration" %}
-        <div class="mb-3">
-            <label for="size">Select Size (pixels):</label>
-            <select name="size" id="size" class="form-select">
-                <option value="">--Choose a size--</option>
-                <option value="1080x1350">1080×1350 px</option>
-                <option value="1080x1080">1080×1080 px</option>
-                <option value="1920x1080">1920×1080 px</option>
-                <option value="3508x4961">3508×4961 px</option>
-            </select>
-        </div>
-    {% elif artwork.art_type == "3d" or artwork.art_type == "handmade_crafts" %}
-        <p><strong>Size:</strong> {{ artwork.custom_size }}</p>
-    {% else %}
-             <div class="mb-3">
-            <label for="size">Select Size (inches):</label>
-            <select name="size" id="size" class="form-select" required>
-                <option value="">--Choose a size--</option>
-                <option value="A4">A4 (8.3×11.7 in)</option>
-                <option value="A3">A3 (11.7×16.5 in)</option>
-                <option value="A2">A2 (16.5×23.4 in)</option>
-                <option value="A1">A1 (23.4×33.1 in)</option>
-                <option value="18x24">18×24 in</option>
-                <option value="24x36">24×36 in</option>
-            </select>
-        </div>
-    {% endif %}
-
-         <!-- Add a Frame -->
-    {% if artwork.art_type == "poster" or artwork.art_type == "traditional" or artwork.art_type == "exclusive_paintings" or artwork.art_type == "print" %}
-        <div class="mb-3">
-            <label for="frame">Add a Frame:</label>
-            <select name="frame" id="frame" class="form-select" required>
-                <option value="none">No Frame</option>
-                <option value="wood">Wood Frame (+৳300)</option>
-                <option value="metal">Metal Frame (+৳350)</option>
-                <option value="acrylic">Acrylic Frame (+৳250)</option>
-            </select>
-        </div>
-    {% endif %}
-
         <!-- Quantity -->
-    <div class="mb-3">
-        <label for="quantity">Quantity:</label>
-        <input type="number" name="quantity" id="quantity" class="form-control" value="1" min="1" required>
-    </div>
+        <div class="mb-3">
+            <label for="{{ form.quantity.id_for_label }}">Quantity:</label>
+            {{ form.quantity }}
+            {% if form.quantity.errors %}
+                <div class="text-danger">{{ form.quantity.errors }}</div>
+            {% endif %}
+        </div>
 
-    <button type="submit" class="btn btn-success">🛒 Place Order</button>
-</form>
+        <!-- Size (optional) -->
+        {% if form.fields.size %}
+            <div class="mb-3">
+                <label for="{{ form.size.id_for_label }}">Select Size:</label>
+                {{ form.size }}
+                {% if form.size.errors %}
+                    <div class="text-danger">{{ form.size.errors }}</div>
+                {% endif %}
+            </div>
+        {% endif %}
+
+        <!-- Frame (optional) -->
+        {% if form.fields.frame %}
+            <div class="mb-3">
+                <label for="{{ form.frame.id_for_label }}">Add a Frame:</label>
+                {{ form.frame }}
+                {% if form.frame.errors %}
+                    <div class="text-danger">{{ form.frame.errors }}</div>
+                {% endif %}
+            </div>
+        {% endif %}
+
+        <!-- Submit Button -->
+        <button type="submit" name="place_order" class="btn btn-success">🛒 Place Order</button>
+    </form>
 
     <a href="{% url 'order_list' %}" class="btn btn-outline-light mt-3">Back to My Orders</a>
 </div>

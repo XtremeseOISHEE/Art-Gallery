@@ -1,21 +1,36 @@
 {% extends 'base.html' %}
+
 {% block content %}
-  <h2>Confirm Payment</h2>
-  <ul>
-    {% for item in items %}
-      <li>{{ item.artwork.title }} — Quantity: {{ item.quantity }} — Subtotal: {{ item.get_total_price }}৳</li>
-    {% endfor %}
-  </ul>
+<div class="container mt-5" style="max-width: 800px;">
+  <div class="card bg-dark text-light shadow-lg">
+    <div class="card-body">
+      <h2 class="card-title text-center mb-4">💳 Confirm Payment</h2>
 
-  <p><strong>Total:</strong> {{ total_price }}৳</p>
+      <ul class="list-group mb-4">
+        {% for item in items %}
+          <li class="list-group-item bg-dark text-light d-flex justify-content-between">
+            <span>{{ item.artwork.title }} (x{{ item.quantity }})</span>
+            <strong>{{ item.get_total_price }}৳</strong>
+          </li>
+        {% endfor %}
+        <li class="list-group-item bg-secondary text-light d-flex justify-content-between fw-bold">
+          <span>Total</span>
+          <span>{{ total_price }}৳</span>
+        </li>
+      </ul>
 
-  <form method="POST" action="{% url 'cart_order_confirm' %}">
-    {% csrf_token %}
-    {% for item in items %}
-      <input type="hidden" name="selected_items" value="{{ item.id }}">
-    {% endfor %}
-    <button type="submit">💳 Pay Now</button>
-  </form>
+      <form method="POST" action="{% url 'cart_order_confirm' %}">
+        {% csrf_token %}
+        {% for item in items %}
+          <input type="hidden" name="selected_items" value="{{ item.id }}">
+        {% endfor %}
+        <button type="submit" class="btn btn-success w-100">✅ Pay Now</button>
+      </form>
 
-  <a href="{% url 'view_cart' %}">← Back to Cart</a>
+      <div class="text-center mt-3">
+        <a href="{% url 'view_cart' %}" class="btn btn-link text-light">&larr; Back to Cart</a>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}

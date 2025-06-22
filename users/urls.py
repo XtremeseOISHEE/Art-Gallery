@@ -46,5 +46,6 @@ urlpatterns = [
         auth_views.PasswordChangeDoneView.as_view(template_name='users/password_change_done.html'),
         name='password_change_done'
     ),
-    
+    path('approve-staffs/', views.approve_staff_list, name='approve_staff_list'),
+    path('approve-staffs/<int:user_id>/', views.approve_staff, name='approve_staff'),
 ]

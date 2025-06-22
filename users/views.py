@@ -111,3 +111,17 @@ def edit_profile(request):
     return render(request, 'users/edit_profile.html', {'form': form})
     #return redirect('view_profile', username=request.user.username)
 
+from django.contrib.auth import get_user_model
+User = get_user_model()
+
+@user_passes_test(lambda u: u.is_superuser)
+def approve_staff_list(request):
+    pending_staffs = User.objects.filter(role='staff', is_staff=False)
+    return render(request, 'users/approve_staff_list.html', {'pending_staffs': pending_staffs})
+
+@user_passes_test(lambda u: u.is_superuser)
+def approve_staff(request, user_id):
+    staff_user = get_object_or_404(User, id=user_id, role='staff', is_staff=False)
+    staff_user.is_staff = True
+    staff_user.save()
+    return redirect('approve_staff_list')

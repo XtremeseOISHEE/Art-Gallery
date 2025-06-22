@@ -3,23 +3,29 @@
 {% block title %}Pending Artworks{% endblock %}
 
 {% block content %}
-    <h2>Pending Artworks</h2>
+<div class="container mt-4">
+    <h2 class="text-center">🎨 Pending Artworks for Approval</h2>
+
     {% if pending_arts %}
-        <ul class="list-group">
+        <div class="row">
             {% for artwork in pending_arts %}
-                <li class="list-group-item">
-                    <h3>{{ artwork.title }}</h3>
-                    <p>{{ artwork.description }}</p>
-                    <img src="{{ artwork.image.url }}" alt="{{ artwork.title }}" style="width: 100px; height: auto;">
-                    <p><strong>Price:</strong> {{ artwork.price }}</p>
-                    <form action="{% url 'artwork_approve' pk=artwork.pk %}" method="post">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-success">Approve</button>
-                    </form>
-                </li>
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        <img src="{{ artwork.image.url }}" class="card-img-top" alt="{{ artwork.title }}">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ artwork.title }}</h5>
+                            <p class="card-text">{{ artwork.description|truncatewords:20 }}</p>
+                            <p><strong>৳{{ artwork.price }}</strong></p>
+                            <a href="{% url 'artwork_approve' artwork.pk %}" class="btn btn-success">
+                                ✅ Approve
+                            </a>
+                        </div>
+                    </div>
+                </div>
             {% endfor %}
-        </ul>
+        </div>
     {% else %}
-        <p>No pending artworks at the moment.</p>
+        <p class="text-center">No pending artworks at the moment.</p>
     {% endif %}
+</div>
 {% endblock %}

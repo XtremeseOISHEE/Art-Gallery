@@ -1,29 +1,52 @@
 {% extends 'base.html' %}
 
 {% block content %}
-  <h2>Your Cart</h2>
+<style>
+  .form-check-label {
+    background-color: rgba(53, 53, 54, 0);
+    color: white;
+    padding: 0px;
+    border-radius: 5px;
+    display: block;
+  }
 
-  {% if items %}
-    <form method="post" action="{% url 'proceed_to_payment' %}">
-      {% csrf_token %}
-      <ul>
-        {% for item in items %}
-          <li>
-            <label>
-              <input type="checkbox" name="selected_items" value="{{ item.id }}">
-              <strong>{{ item.artwork.title }}</strong> –
-              Quantity: {{ item.quantity }} –
-              Total: {{ item.get_total_price }}৳
-            </label>
-          </li>
-        {% endfor %}
-      </ul>
-      <button type="submit">✅ Proceed to Payment</button>
-    </form>
-  {% else %}
-    <p>Your cart is empty 🛒</p>
-  {% endif %}
+  .list-group-item {
+    background-color: transparent;
+    border: none;
+  }
+</style>
 
-  <br>
-  <a href="{% url 'artwork_list' %}" class="nav-link">← Back to Home</a>
+<div class="container mt-5" style="max-width: 700px;">
+  <div class="card bg-dark text-light shadow-lg">
+    <div class="card-body">
+      <h2 class="card-title text-center mb-4">🛒 Your Cart</h2>
+
+      {% if items %}
+        <form method="post" action="{% url 'proceed_to_payment' %}">
+          {% csrf_token %}
+          <ul class="list-group mb-4">
+            {% for item in items %}
+              <li class="list-group-item d-flex align-items-center">
+                <div class="form-check">
+                  <input class="form-check-input me-2" type="checkbox" name="selected_items" value="{{ item.id }}" id="item{{ item.id }}">
+                  <label class="form-check-label" for="item{{ item.id }}">
+                    <strong>{{ item.artwork.title }}</strong> &ndash; Qty: {{ item.quantity }} &ndash;
+                    <span class="text-info fw-semibold">{{ item.get_total_price }}৳</span>
+                  </label>
+                </div>
+              </li>
+            {% endfor %}
+          </ul>
+          <button type="submit" class="btn btn-success w-100">✅ Proceed to Payment</button>
+        </form>
+      {% else %}
+        <p class="text-center fs-5 text-muted">Your cart is empty.</p>
+      {% endif %}
+
+      <div class="text-center mt-4">
+        <a href="{% url 'artwork_list' %}" class="btn btn-outline-light btn-sm">&larr; Back to Home</a>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}

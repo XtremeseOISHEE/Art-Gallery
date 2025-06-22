@@ -64,11 +64,18 @@
                 <li class="nav-item">
                   <a class="nav-link" href="{% url 'view_cart' %}">View Cart</a>
                 </li>
+
               {% endif %}
 
               {% if user.is_superuser %}
                 <li class="nav-item">
                   <a class="nav-link" href="{% url 'admin_dashboard' %}">Admin Dashboard</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="{% url 'pending_artworks' %}">Pending Artworks</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="{% url 'approve_staff_list' %}">Approve Staff</a>
                 </li>
               {% endif %}
 
@@ -76,11 +83,16 @@
                 <li class="nav-item">
                   <a class="nav-link" href="{% url 'pending_artworks' %}">Pending Artworks</a>
                 </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="{% url 'admin_dashboard' %}">Order Dashboard</a>
+                </li>
               {% endif %}
               <!--  -->
+              {% if not user.is_superuser  %}
               <li class="nav-item">
                  <a class="nav-link" href="{% url 'faq' %}">Help</a>
                 </li>
+              {% endif %}
                <!--  -->
               <li class="nav-item">
                 <form method="POST" action="{% url 'logout' %}" class="d-flex align-items-center">

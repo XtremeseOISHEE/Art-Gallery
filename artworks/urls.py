@@ -1,6 +1,6 @@
 from django.urls import path
 from . import views
-
+from .views import pending_artworks, artwork_approve
 urlpatterns = [
     path('', views.home, name='home'),
     path('artworks/', views.artwork_list, name='artwork_list'), 
@@ -11,10 +11,11 @@ urlpatterns = [
     path('<int:pk>/approve/', views.artwork_approve, name='artwork_approve'),
     path('artworks/search/', views.artwork_search, name='artwork_search'),
     path('my-arts/', views.my_artworks, name='my_artworks'),
-    path('admin/pending-artworks/', views.pending_artworks, name='pending_artworks'),
-    path('admin/approve-artwork/<int:pk>/', views.artwork_approve, name='artwork_approve'),
+    # Corrected URLs without admin prefix:
+    path('pending-artworks/', views.pending_artworks, name='pending_artworks'),
+    path('approve-artwork/<int:pk>/', views.artwork_approve, name='artwork_approve'),
+
     path('artwork/<int:artwork_id>/like/', views.like_artwork, name='like_artwork'),
-    # 
     path('faq/', views.faq_view, name='faq'),
     
 ]
