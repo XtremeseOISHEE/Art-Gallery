@@ -21,31 +21,48 @@ from django.contrib.auth.decorators import login_required
 from .forms import OrderForm
 from artworks.models import Artwork
 
+
 @login_required
 def create_order(request, artwork_id):
     artwork = get_object_or_404(Artwork, id=artwork_id)
 
-    # 🔥 New access control
     if request.user.role not in ['buyer', 'seller']:
         messages.error(request, "You are not authorized to place an order.")
         return redirect('artwork_detail', pk=artwork_id)
 
     if request.method == 'POST':
-        form = OrderForm(request.POST)
+        form = OrderForm(request.POST, artwork=artwork)
         if form.is_valid():
             order = form.save(commit=False)
             order.user = request.user
             order.artwork = artwork
-            order.total_price = artwork.price * form.cleaned_data['quantity']
+            order.size = form.cleaned_data.get('size')
+            order.frame = form.cleaned_data.get('frame') or 'none'
+            order.quantity = form.cleaned_data['quantity']
+
+            frame_price_map = {
+                'wood': 300,
+                'metal': 350,
+                'acrylic': 250,
+                'none': 0,
+            }
+            frame_extra = frame_price_map.get(order.frame, 0)
+            order.total_price = (artwork.price + frame_extra) * order.quantity
             order.save()
-            messages.success(request, "Order created! Please confirm to proceed to payment.")
-            return redirect('order_confirm', order_id=order.id)
+
+            # If "Place Order" button is clicked, go directly to confirm
+            if 'place_order' in request.POST:
+                return redirect('order_confirm', order_id=order.id)
+            else:
+                return redirect('view_cart')
         else:
             messages.error(request, "There was an error in your order form. Please try again.")
     else:
-        form = OrderForm()
+        form = OrderForm(artwork=artwork)
 
     return render(request, 'orders/create_order.html', {'form': form, 'artwork': artwork})
+
+
 
 # View Order detail
 @login_required
