@@ -3,20 +3,43 @@
 {% block title %}Help & FAQ{% endblock %}
 
 {% block content %}
-<div style="max-width: 800px; margin: auto; padding: 30px;">
-  <h2>Frequently Asked Questions</h2>
-  <hr>
-  <h4>How do I upload artwork?</h4>
-  <p>Go to the "Upload" button in the navigation bar and fill in the form with your artwork details.</p>
+<div class="container mt-5" style="max-width: 800px;">
+  <div class="card bg-dark text-light shadow p-4 rounded-4">
+    <h2 class="text-center mb-4">❓ Frequently Asked Questions</h2>
+    <hr class="bg-light">
 
-  <h4>How can I contact the seller?</h4>
-  <p>Click on the "Message Seller" button on the artwork detail page to start a conversation.</p>
+    <div class="mb-4">
+      <h5>🎨 How do I upload artwork?</h5>
+      <p>Go to the "Upload" button in the navigation bar and fill in the form with your artwork details.</p>
+    </div>
 
-  <h4>What file types are supported?</h4>
-  <p>We support JPEG, PNG, and WEBP formats.</p>
+    <div class="mb-4">
+      <h5>💬 How can I contact the seller?</h5>
+      <p>Click on the "Message Seller" button on the artwork detail page to start a conversation.</p>
+    </div>
 
-  <!-- Add more questions as needed -->
+    <div class="mb-4">
+      <h5>🖼️ What file types are supported?</h5>
+      <p>We support JPEG, PNG, and WEBP formats for image uploads.</p>
+    </div>
+
+    <div class="mb-4">
+      <h5>🔒 Is my information secure?</h5>
+      <p>Yes, we use secure protocols and encryption to protect your personal data.</p>
+    </div>
+
+    <div class="mb-4">
+      <h5>📦 How do I track my orders?</h5>
+      <p>Go to your profile and select "My Orders" to view status and details of past and current orders.</p>
+    </div>
+
+    <div class="mb-2">
+      <h5>💸 What payment methods are accepted?</h5>
+      <p>We accept bKash, PayPal, Credit/Debit Cards, and Cash on Delivery.</p>
+    </div>
+  </div>
 </div>
+
 <!-- Floating Message Button -->
 <a href="{% url 'inbox' %}" title="Go to Messages" 
    class="btn btn-primary position-fixed bottom-0 end-0 m-4 rounded-circle shadow"

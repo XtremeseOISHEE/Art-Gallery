@@ -3,29 +3,29 @@
 {% block title %}Pending Artworks{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <h2 class="text-center">🎨 Pending Artworks for Approval</h2>
+<div class="container mt-5">
+    <h2 class="text-center text-light mb-4">🎨 Pending Artworks for Approval</h2>
 
     {% if pending_arts %}
         <div class="row">
             {% for artwork in pending_arts %}
                 <div class="col-md-4 mb-4">
-                    <div class="card h-100">
-                        <img src="{{ artwork.image.url }}" class="card-img-top" alt="{{ artwork.title }}">
-                        <div class="card-body">
-                            <h5 class="card-title">{{ artwork.title }}</h5>
-                            <p class="card-text">{{ artwork.description|truncatewords:20 }}</p>
-                            <p><strong>৳{{ artwork.price }}</strong></p>
-                            <a href="{% url 'artwork_approve' artwork.pk %}" class="btn btn-success">
-                                ✅ Approve
-                            </a>
+                    <div class="card bg-dark text-light h-100 shadow rounded-4">
+                        <img src="{{ artwork.image.url }}" class="card-img-top rounded-top" alt="{{ artwork.title }}" style="object-fit: cover; height: 220px;">
+                        <div class="card-body d-flex flex-column justify-content-between">
+                            <div>
+                                <h5 class="card-title">{{ artwork.title }}</h5>
+                                <p class="card-text small text-muted">{{ artwork.description|truncatewords:20 }}</p>
+                                <p class="fw-bold">৳{{ artwork.price }}</p>
+                            </div>
+                            <a href="{% url 'artwork_approve' artwork.pk %}" class="btn btn-success mt-2">✅ Approve</a>
                         </div>
                     </div>
                 </div>
             {% endfor %}
         </div>
     {% else %}
-        <p class="text-center">No pending artworks at the moment.</p>
+        <p class="text-center text-muted">No pending artworks at the moment.</p>
     {% endif %}
 </div>
 {% endblock %}
