@@ -1,20 +1,31 @@
 {% extends 'base.html' %}
-{% load static %}
 {% load humanize %}
 
 {% block title %}My Notifications{% endblock %}
 
 {% block content %}
-<h2>Notifications</h2>
+<div class="container py-4" style="background-color: #121212; min-height: 80vh; color: #eee;">
+  <h2 class="mb-4">Notifications</h2>
 
-<ul class="list-group">
-  {% for n in notifications %}
-    <li class="list-group-item">
-      {{ n.actor }} {{ n.verb }} {% if n.target %} "{{ n.target }}" {% endif %}
-      <small class="text-muted">- {{ n.timestamp|naturaltime }}</small>
-    </li>
-  {% empty %}
-    <li class="list-group-item">No notifications.</li>
-  {% endfor %}
-</ul>
+  {% if notifications %}
+    <ul class="list-group">
+      {% for n in notifications %}
+        <a href="{% url 'notification_redirect' n.pk %}" 
+           class="list-group-item list-group-item-action
+           {% if n.unread %}bg-secondary fw-bold{% else %}bg-dark text-light{% endif %}"
+           style="border: none; border-bottom: 1px solid #333; text-decoration: none;">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <span class="text-info">{{ n.actor.username }}</span> {{ n.verb }}
+              {% if n.target %} <span class="fst-italic">"{{ n.target }}"</span>{% endif %}
+            </div>
+            <small class="text-muted">{{ n.timestamp|naturaltime }}</small>
+          </div>
+        </a>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p class="text-muted">No notifications.</p>
+  {% endif %}
+</div>
 {% endblock %}

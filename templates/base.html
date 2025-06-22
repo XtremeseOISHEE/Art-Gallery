@@ -1,4 +1,4 @@
-{% load static %}
+{% comment %} {% load static %}
 {% load user_tags %}
 
 <!DOCTYPE html>
@@ -152,4 +152,215 @@
 
     <script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
   </body>
+</html> {% endcomment %}
+
+
+{% load static %}
+{% load user_tags %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{% block title %}Art Gallery{% endblock %}</title>
+
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}" />
+  <link rel="stylesheet" href="{% static 'bootstrap/css/base.css' %}" />
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet" />
+
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+  <style>
+    /* Navbar links spacing */
+    .navbar-nav .nav-link {
+      padding-left: 1rem;
+      padding-right: 1rem;
+      white-space: nowrap;
+    }
+
+    /* Logout button style - full red background */
+    .btn-logout {
+      color: white !important;
+      background-color: #dc3545; /* Bootstrap Red */
+      border: none;
+      padding: 0.375rem 0.75rem;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+      border-radius: 0.25rem;
+    }
+    .btn-logout:hover {
+      background-color: #b02a37; /* Darker red on hover */
+      color: white !important;
+      text-decoration: none;
+    }
+
+    /* Align logout, notification, message, profile nicely with equal spacing */
+    .navbar-right-group > * {
+      margin-left: 1rem;
+      margin-right: 1rem;
+      display: flex;
+      align-items: center;
+    }
+
+    /* Profile dropdown icons full color */
+    .dropdown-menu .dropdown-item i {
+      color: #0d6efd; /* Bootstrap primary blue */
+      font-size: 1.1rem;
+    }
+  </style>
+
+  {% block head %}{% endblock %}
+</head>
+
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+    <div class="container">
+
+      <!-- Brand -->
+      <a class="navbar-brand fw-bold" href="{% url 'homepage' %}">ArtNest</a>
+
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarNav">
+
+        <!-- Left side nav -->
+        <ul class="navbar-nav me-auto">
+          <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'homepage' %}active{% endif %}" href="{% url 'homepage' %}">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'artwork_list' %}active{% endif %}" href="{% url 'artwork_list' %}">Artworks</a>
+          </li>
+
+          {% if user.is_authenticated %}
+            {% if user.role == 'seller' %}
+              <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'artwork_create' %}active{% endif %}" href="{% url 'artwork_create' %}">Create Art</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'my_artworks' %}active{% endif %}" href="{% url 'my_artworks' %}">My Arts</a>
+              </li>
+            {% endif %}
+
+            {% if not user.is_superuser and user.role != 'staff' %}
+              <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'order_list' %}active{% endif %}" href="{% url 'order_list' %}">My Orders</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'view_cart' %}active{% endif %}" href="{% url 'view_cart' %}">View Cart</a>
+              </li>
+            {% endif %}
+
+            {% if user.is_superuser %}
+              <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'admin_dashboard' %}active{% endif %}" href="{% url 'admin_dashboard' %}">Admin Dashboard</a>
+              </li>
+            {% endif %}
+
+            {% if user.role == 'staff' %}
+              <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'pending_artworks' %}active{% endif %}" href="{% url 'pending_artworks' %}">Pending Artworks</a>
+              </li>
+            {% endif %}
+          {% endif %}
+        </ul>
+
+        <!-- Right side nav -->
+        <ul class="navbar-nav navbar-right-group align-items-center">
+
+          {% if user.is_authenticated %}
+            <!-- Logout Button -->
+            <li class="nav-item">
+              <form method="POST" action="{% url 'logout' %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-logout">Logout</button>
+              </form>
+            </li>
+
+            <!-- Notification Bell Icon -->
+            <li class="nav-item">
+              <a class="nav-link position-relative" href="{% url 'my_notifications' %}" title="Notifications" style="font-size:1.3rem;">
+                <i class="bi bi-bell"></i>
+                {% if unread_count > 0 %}
+                  <span class="badge bg-danger position-absolute top-0 start-100 translate-middle rounded-pill">
+                    {{ unread_count }}
+                    <span class="visually-hidden">unread notifications</span>
+                  </span>
+                {% endif %}
+              </a>
+            </li>
+
+            <!-- Message Icon -->
+            <li class="nav-item">
+              <a class="nav-link position-relative" href="{% url 'inbox' %}" title="Messages" style="font-size:1.3rem;">
+                <i class="bi bi-chat-dots"></i>
+                {% if unread_message_count > 0 %}
+                  <span class="badge bg-danger position-absolute top-0 start-100 translate-middle rounded-pill">
+                    {{ unread_message_count }}
+                    <span class="visually-hidden">unread messages</span>
+                  </span>
+                {% endif %}
+              </a>
+            </li>
+
+            <!-- Profile Dropdown -->
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdown"
+                 role="button" data-bs-toggle="dropdown" aria-expanded="false" title="{{ user.username }}" style="font-size:1.4rem;">
+                <i class="bi bi-person-circle"></i>
+              </a>
+
+              {% get_admin_user as admin_user %}
+              <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                <li>
+                  <a class="dropdown-item d-flex align-items-center gap-2" href="{% url 'view_profile' username=user.username %}">
+                    <i class="bi bi-eye"></i> View Profile
+                  </a>
+                </li>
+                <li>
+                  <a class="dropdown-item d-flex align-items-center gap-2" href="{% url 'edit_profile' %}">
+                    <i class="bi bi-pencil-square"></i> Edit Profile
+                  </a>
+                </li>
+                {% if admin_user and admin_user.username != user.username %}
+                  <li>
+                    <a class="dropdown-item d-flex align-items-center gap-2" href="{% url 'conversation_detail' admin_user.username %}">
+                      <i class="bi bi-chat-dots"></i> Contact Admin
+                    </a>
+                  </li>
+                {% endif %}
+              </ul>
+            </li>
+
+          {% else %}
+            <!-- When user not authenticated, show login/register on right -->
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'login' %}">Login</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'register' %}">Register</a>
+            </li>
+          {% endif %}
+
+        </ul>
+
+      </div>
+    </div>
+  </nav>
+
+  <div class="container mt-3">
+    {% block content %}{% endblock %}
+  </div>
+
+  <script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+</body>
 </html>
