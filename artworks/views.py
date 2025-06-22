@@ -111,7 +111,11 @@ def artwork_list(request):
         'art_type_choices': art_type_choices
     })
 
+# help faq
+from django.shortcuts import render
 
+def faq_view(request):
+    return render(request, 'faq.html')
 
 # Artwork Details
 # def artwork_detail(request, pk):

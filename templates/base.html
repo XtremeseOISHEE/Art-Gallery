@@ -77,7 +77,11 @@
                   <a class="nav-link" href="{% url 'pending_artworks' %}">Pending Artworks</a>
                 </li>
               {% endif %}
-
+              <!--  -->
+              <li class="nav-item">
+                 <a class="nav-link" href="{% url 'faq' %}">Help</a>
+                </li>
+               <!--  -->
               <li class="nav-item">
                 <form method="POST" action="{% url 'logout' %}" class="d-flex align-items-center">
                   {% csrf_token %}
