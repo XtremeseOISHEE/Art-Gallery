@@ -212,6 +212,62 @@ from reviews.forms import ReviewForm, ReviewCommentForm  # Add ReviewCommentForm
 from artworks.models import Artwork
 from reviews.models import Review, ReviewLike, ReviewComment
 
+# @login_required
+# def artwork_detail(request, pk):
+#     # Retrieve the artwork
+#     artwork = get_object_or_404(Artwork, pk=pk)
+
+#     # Check if the artwork is approved
+#     if not artwork.is_approved:
+#         messages.info(request, "Your artwork is pending approval. We will notify you once it's approved.")
+#         return redirect('artwork_list')
+
+#     # Approved artwork: increase view count
+#     artwork.views += 1
+#     artwork.save()
+
+#     # Determine whether to show the order button
+#     show_order_button = request.user.role in ['buyer', 'seller']
+
+#     order_count = None
+#     all_orders_count = None
+
+#     # Seller order count
+#     if request.user.role == 'seller' and artwork.artist == request.user:
+#         order_count = artwork.order_set.count()
+
+#     # Staff order counts
+#     if request.user.role == 'staff':
+#         all_orders_count = Artwork.objects.annotate(order_count=Count('order')).values('title', 'order_count')
+
+#     # Get all reviews for the artwork
+#     reviews = artwork.reviews.all()
+
+#     # Prepare likes and dislikes counts + user like/dislike status
+#     user_likes = {}
+#     for review in reviews:
+#         review.likes_count = review.likes.filter(is_like=True).count()
+#         review.dislikes_count = review.likes.filter(is_like=False).count()
+
+#         # Check if the current user has liked or disliked
+#         like = review.likes.filter(user=request.user).first()
+#         if like:
+#             user_likes[review.id] = like.is_like
+
+#     # Render the page
+#     context = {
+#         'artwork': artwork,
+#         'show_order_button': show_order_button,
+#         'order_count': order_count,
+#         'all_orders_count': all_orders_count,
+#         'reviews': reviews,  # pass reviews manually
+#         'form': ReviewForm(),  # form for adding a review
+#         'user_likes': user_likes,
+#     }
+
+#     return render(request, 'artworks/artwork_detail.html', context)
+
+
 @login_required
 def artwork_detail(request, pk):
     # Retrieve the artwork
@@ -266,7 +322,6 @@ def artwork_detail(request, pk):
     }
 
     return render(request, 'artworks/artwork_detail.html', context)
-
 
 @user_passes_test(lambda u: u.is_staff)
 def artwork_approve(request, pk):
