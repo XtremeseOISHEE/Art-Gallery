@@ -1,6 +1,6 @@
 from django import forms
-from .models import Artwork
-from .models import Artwork, SIZE_CHOICES, PIXEL_SIZE_CHOICES
+from .models import Artwork, ArtworkImage, SIZE_CHOICES, PIXEL_SIZE_CHOICES, EXTRA_IMAGES
+from django.forms import modelformset_factory, inlineformset_factory
 
 # class ArtworkForm(forms.ModelForm):
 #     class Meta:
@@ -35,3 +35,28 @@ class ArtworkForm(forms.ModelForm):
         else:
             self.fields['size'].choices = SIZE_CHOICES
             self.fields['custom_size'].widget = forms.HiddenInput()
+
+
+# ArtworkImageFormSet = modelformset_factory(
+#     ArtworkImage,
+#     fields=('image',),
+#     extra=EXTRA_IMAGES,  # allow 2 additional images
+#     max_num=3
+# )
+
+# Optional: Custom ModelForm for ArtworkImage to add 'multiple' attribute to the file input
+class ArtworkImageForm(forms.ModelForm):
+    class Meta:
+        model = ArtworkImage
+        fields = ['image']  # don't add 'multiple' here
+
+# Inline formset for up to 4 images
+ArtworkImageFormSet = inlineformset_factory(
+    Artwork, ArtworkImage,
+    form=ArtworkImageForm,            # use the custom form to allow multi-select
+    fields=['image'],
+    extra=EXTRA_IMAGES,                          # show 4 empty file fields by default
+    max_num=EXTRA_IMAGES,                        # hard limit of 4 images
+    validate_max=True,                # enforce the max_num limit in validation
+    can_delete=True                   # allow removing an image form (optional)
+)

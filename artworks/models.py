@@ -77,6 +77,7 @@ FRAME_CHOICES = [
     ('acrylic', 'Acrylic Frame (+৳250)'),
 ]
 
+EXTRA_IMAGES = 4
 
 
 class Artwork(models.Model):
@@ -101,6 +102,9 @@ class Artwork(models.Model):
     def __str__(self):
         return self.title
 
+class ArtworkImage(models.Model):
+    artwork = models.ForeignKey('Artwork', on_delete=models.CASCADE, related_name='extra_images')
+    image = models.ImageField(upload_to='artworks/extra/')
 
 
 @property

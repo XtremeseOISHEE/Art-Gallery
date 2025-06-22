@@ -7,10 +7,21 @@
 <div style="max-width: 900px; margin: auto; padding: 20px; font-family: Arial, sans-serif;">
   <h2 style="text-align: center; margin-bottom: 20px;">{{ artwork.title }}</h2>
 
-  <div style="text-align: center; margin-bottom: 20px;">
-    <img src="{{ artwork.image.url }}" alt="{{ artwork.title }}" oncontextmenu="return false" draggable="false"  
-         style="max-width: 100%; height: auto; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+  <!-- Main Image -->
+<div style="text-align: center; margin-bottom: 20px;">
+  <img src="{{ artwork.image.url }}" alt="{{ artwork.title }}"
+       style="width: 100%; max-width: 400px; height: auto; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+</div>
+
+<!-- Extra Images Gallery -->
+{% if artwork.extra_images.all %}
+  <div style="display: flex; flex-wrap: wrap; gap: 15px; justify-content: center; margin-bottom: 30px;">
+    {% for img in artwork.extra_images.all %}
+      <img src="{{ img.image.url }}" alt="Additional Image"
+           style="width: 120px; height: auto; border-radius: 6px; box-shadow: 0 2px 6px rgba(0,0,0,0.15); object-fit: cover;">
+    {% endfor %}
   </div>
+{% endif %}
 
   <p><strong>Description:</strong> {{ artwork.description }}</p>
   <p><strong>Price:</strong> ৳{{ artwork.price }}</p>
