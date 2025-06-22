@@ -166,7 +166,7 @@
   </body>
 </html> {% endcomment %}
 
-
+{% comment %} 
 {% load static %}
 {% load user_tags %}
 
@@ -235,7 +235,7 @@
     <div class="container">
 
       <!-- Brand -->
-      <a class="navbar-brand fw-bold" href="{% url 'homepage' %}">ArtNest</a>
+      <a class="navbar-brand fw-bold" href="{% url 'home' %}">ArtNest</a>
 
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
         aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -247,7 +247,7 @@
         <!-- Left side nav -->
         <ul class="navbar-nav me-auto">
           <li class="nav-item">
-            <a class="nav-link {% if request.resolver_match.url_name == 'homepage' %}active{% endif %}" href="{% url 'homepage' %}">Home</a>
+            <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}" href="{% url 'home' %}">Home</a>
           </li>
           <li class="nav-item">
             <a class="nav-link {% if request.resolver_match.url_name == 'artwork_list' %}active{% endif %}" href="{% url 'artwork_list' %}">Artworks</a>
@@ -375,4 +375,173 @@
 
   <script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
 </body>
+</html> {% endcomment %}
+
+{% load static %}
+{% load user_tags %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}Art Gallery{% endblock %}</title>
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}" />
+    <link rel="stylesheet" href="{% static 'bootstrap/css/base.css' %}" />
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet" />
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
+
+    {% block head %}{% endblock %}
+  </head>
+
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+      <div class="container">
+        <a class="navbar-brand" href="{% url 'home' %}">ArtNest</a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+          aria-controls="navbarNav"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav me-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'home' %}">Home</a>
+            </li>
+
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'artwork_list' %}">Artworks</a>
+            </li>
+
+            {% if user.is_authenticated %}
+              {% if user.role == 'seller' %}
+                <li class="nav-item">
+                  <a class="nav-link" href="{% url 'artwork_create' %}">Create Art</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="{% url 'my_artworks' %}">My Arts</a>
+                </li>
+              {% endif %}
+
+              {% if not user.is_superuser and user.role != 'staff' %}
+                <li class="nav-item">
+                  <a class="nav-link" href="{% url 'order_list' %}">My Orders</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="{% url 'view_cart' %}">View Cart</a>
+                </li>
+              {% endif %}
+
+              {% if user.is_superuser %}
+                <li class="nav-item">
+                  <a class="nav-link" href="{% url 'admin_dashboard' %}">Admin Dashboard</a>
+                </li>
+              {% endif %}
+
+              {% if user.role == 'staff' %}
+                <li class="nav-item">
+                  <a class="nav-link" href="{% url 'pending_artworks' %}">Pending Artworks</a>
+                </li>
+              {% endif %}
+              <!--  -->
+              <li class="nav-item">
+                 <a class="nav-link" href="{% url 'faq' %}">Help</a>
+                </li>
+               <!--  -->
+              <li class="nav-item">
+                <form method="POST" action="{% url 'logout' %}" class="d-flex align-items-center">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-logout nav-link btn btn-link text-white">
+                    Logout
+                  </button>
+                </form>
+              </li>
+            {% else %}
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'login' %}">Login</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'register' %}">Register</a>
+              </li>
+            {% endif %}
+          </ul>
+
+          {% if user.is_authenticated %}
+            <ul class="navbar-nav ms-auto">
+              <!-- Notification Bell Icon -->
+              <li class="nav-item">
+                <a class="nav-link position-relative" href="{% url 'my_notifications' %}" title="Notifications">
+                  <i class="bi bi-bell" style="font-size: 1.5rem;"></i>
+                  {% if unread_count > 0 %}
+                    <span class="badge bg-danger position-absolute top-0 start-100 translate-middle rounded-pill">
+                      {{ unread_count }}
+                      <span class="visually-hidden">unread notifications</span>
+                    </span>
+                  {% endif %}
+                </a>
+              </li>
+
+              <!-- Message Icon -->
+              <li class="nav-item">
+                <a class="nav-link position-relative" href="{% url 'inbox' %}" title="Messages">
+                  <i class="bi bi-chat-dots" style="font-size: 1.5rem;"></i>
+                  {% if unread_message_count > 0 %}
+                    <span class="badge bg-danger position-absolute top-0 start-100 translate-middle rounded-pill">
+                      {{ unread_message_count }}
+                      <span class="visually-hidden">unread messages</span>
+                    </span>
+                  {% endif %}
+                </a>
+              </li>
+
+              <!-- Profile Dropdown -->
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdown"
+                  role="button" data-bs-toggle="dropdown" aria-expanded="false" title="{{ user.username }}">
+                  <i class="bi bi-person-circle fs-4"></i>
+                </a>
+
+                {% get_admin_user as admin_user %}
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                  <li>
+                    <a class="dropdown-item" href="{% url 'view_profile' username=user.username %}">View Profile</a>
+                  </li>
+                  <li>
+                    <a class="dropdown-item" href="{% url 'edit_profile' %}">Edit Profile</a>
+                  </li>
+                  {% if admin_user and admin_user.username != user.username %}
+                    <li>
+                      <a class="dropdown-item" href="{% url 'conversation_detail' admin_user.username %}">
+                        💬 Contact Admin
+                      </a>
+                    </li>
+                  {% endif %}
+                </ul>
+              </li>
+            </ul>
+          {% endif %}
+        </div>
+      </div>
+    </nav>
+
+    <div class="container mt-3">
+      {% block content %}{% endblock %}
+    </div>
+
+    <script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+  </body>
 </html>
+
