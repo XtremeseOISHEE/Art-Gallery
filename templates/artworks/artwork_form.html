@@ -18,9 +18,8 @@
     .artwork-form-container h2 {
         text-align: center;
         margin-bottom: 30px;
-        color: #00b39f;  /* softer teal without glow */
+        color: #00b39f;
         font-weight: 700;
-        /* text-shadow removed */
     }
 
     .artwork-form-container form {
@@ -60,20 +59,31 @@
         transform: scale(1.03);
         box-shadow: 0 0 15px #00b39f;
     }
+
+    .form-error {
+        color: red;
+        font-size: 14px;
+        margin-top: -10px;
+        margin-bottom: 10px;
+    }
+
 </style>
-<!--  -->
-<!-- <div class="mb-3">
-  <label for="id_art_type">Select Art Type:</label>
-  {{ form.art_type }}
-</div> -->
-<!--  -->
+
 <div class="artwork-form-container">
     <h2>Upload / Edit Artwork</h2>
+
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
+
+        {% if form.errors %}
+            <div class="form-error">{{ form.errors }}</div>
+        {% endif %}
         {{ form.as_p }}
 
-        <!-- Add multiple image upload fields via formset -->
+        {% if formset.non_form_errors %}
+            <div class="form-error">{{ formset.non_form_errors }}</div>
+        {% endif %}
+
         {{ formset.management_form }}
         <div class="extra-images-formset">
             <h4>Upload Up to 4 Extra Images</h4>
@@ -81,7 +91,9 @@
                 <div class="form-group">
                     {{ image_form.image.label_tag }}
                     {{ image_form.image }}
-                    {{ image_form.image.errors }}
+                    {% if image_form.image.errors %}
+                        <div class="form-error">{{ image_form.image.errors }}</div>
+                    {% endif %}
                 </div>
             {% endfor %}
         </div>
@@ -89,5 +101,86 @@
         <button type="submit">Save Artwork</button>
     </form>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const artTypeField = document.querySelector('select[name="art_type"]');
+    const sizeField = document.querySelector('select[name="size"]');
+
+    // Safety check - if fields not found, do nothing
+    if (!artTypeField || !sizeField) return;
+
+    // Define your choices - match exactly with your Django SIZE_CHOICES and PIXEL_SIZE_CHOICES
+    const SIZE_CHOICES = [
+        {value: 'A4', text: 'A4 (8.3×11.7 in)'},
+        {value: 'A3', text: 'A3 (11.7×16.5 in)'},
+        {value: 'A2', text: 'A2 (16.5×23.4 in)'},
+        {value: 'A1', text: 'A1 (23.4×33.1 in)'},
+        {value: '18x24', text: '18×24 in'},
+        {value: '24x36', text: '24×36 in'}
+    ];
+
+    const PIXEL_SIZE_CHOICES = [
+        {value: '1080x1350', text: '1080×1350 px'},
+        {value: '1080x1080', text: '1080×1080 px'},
+        {value: '1920x1080', text: '1920×1080 px'},
+        {value: '3508x4961', text: '3508×4961 px (A4 @ 300dpi)'}
+    ];
+
+    const pixelTypes = ['digital', 'illustration'];
+    const manualTypes = ['3d', 'handmade_crafts'];
+
+    // Helper: find the <p> wrapping the size select (assuming form.as_p)
+    function findSizeWrapper() {
+        let el = sizeField;
+        while(el && el.tagName.toLowerCase() !== 'p') {
+            el = el.parentElement;
+        }
+        return el;
+    }
+    const sizeWrapper = findSizeWrapper();
+
+    function updateSizeOptions() {
+        const artType = artTypeField.value;
+        const previousSize = sizeField.value;
+
+        let choices = [];
+        if (pixelTypes.includes(artType)) {
+            choices = PIXEL_SIZE_CHOICES;
+            if (sizeWrapper) sizeWrapper.style.display = '';
+            sizeField.disabled = false;
+        } else if (manualTypes.includes(artType)) {
+            // Hide size field completely for manual types
+            if (sizeWrapper) sizeWrapper.style.display = 'none';
+            sizeField.disabled = true;
+            sizeField.value = '';  // clear size
+            return;
+        } else {
+            choices = SIZE_CHOICES;
+            if (sizeWrapper) sizeWrapper.style.display = '';
+            sizeField.disabled = false;
+        }
+
+        // Clear and fill new options
+        sizeField.innerHTML = '';
+        choices.forEach(choice => {
+            const option = document.createElement('option');
+            option.value = choice.value;
+            option.textContent = choice.text;
+            sizeField.appendChild(option);
+        });
+
+        // Restore previously selected size if still valid
+        if (choices.some(c => c.value === previousSize)) {
+            sizeField.value = previousSize;
+        }
+    }
+
+    artTypeField.addEventListener('change', updateSizeOptions);
+
+    // Initialize on page load
+    updateSizeOptions();
+});
+</script>
 
 {% endblock %}

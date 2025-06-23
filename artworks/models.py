@@ -94,7 +94,10 @@ class Artwork(models.Model):
     # maryam
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='artworks')
     art_type = models.CharField(max_length=30, choices=ART_TYPE_CHOICES)
-    size = models.CharField(max_length=20, choices=SIZE_CHOICES, blank=True, null=True)
+   # models.py
+
+    size = models.CharField(max_length=20, blank=True, null=True)  # no choices here
+
     custom_size = models.CharField(max_length=100, blank=True, null=True)
     frame = models.CharField(max_length=20, choices=FRAME_CHOICES, default='none')
 

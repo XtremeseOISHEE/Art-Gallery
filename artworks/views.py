@@ -20,6 +20,12 @@ def home(request):
 def is_staff(user):
     return user.is_staff
 
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from .forms import ArtworkForm, ArtworkImageFormSet
+from django.shortcuts import render, redirect
+from .forms import ArtworkForm, ArtworkImageFormSet
+from django.contrib.auth.decorators import login_required
 
 @login_required
 def artwork_create(request):
@@ -27,24 +33,32 @@ def artwork_create(request):
         form = ArtworkForm(request.POST, request.FILES)
         formset = ArtworkImageFormSet(request.POST, request.FILES)
 
-        if form.is_valid() and formset.is_valid():
+        print("📦 POST data:", request.POST)
+        print("🧩 Submitted art_type:", request.POST.get('art_type'))
+        print("📏 Submitted size:", request.POST.get('size'))
+
+        if form.is_valid():
             artwork = form.save(commit=False)
             artwork.artist = request.user
             artwork.save()
             form.save_m2m()
 
-            for image_form in formset:
-                if image_form.cleaned_data:
-                    image = image_form.save(commit=False)
-                    image.artwork = artwork
-                    image.save()
-
-            return redirect('artwork_detail', pk=artwork.pk)
+            formset = ArtworkImageFormSet(request.POST, request.FILES, instance=artwork)
+            if formset.is_valid():
+                formset.save()
+                return redirect('artwork_detail', pk=artwork.pk)
+            else:
+                print("❌ Formset errors:", formset.errors)
+        else:
+            print("❌ Form errors:", form.errors)
     else:
         form = ArtworkForm()
         formset = ArtworkImageFormSet()
 
-    return render(request, 'artworks/artwork_form.html', {'form': form, 'formset': formset})
+    return render(request, 'artworks/artwork_form.html', {
+        'form': form,
+        'formset': formset
+    })
 
 # Edit Artwork
 @login_required
